@@ -3,4 +3,4 @@
 ## Steps to run
 
 1. clone repo
-2. ``python3 manage.py runsever``
+2. ``python3 manage.py runserver``
