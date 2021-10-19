@@ -12,3 +12,6 @@ class SignUpView(generic.CreateView):
 
 def index(request):
     return HttpResponse("Hello, world. Welcome to Kyntra.")
+
+def admin_dashboard(request):
+    return render(request,'admin/admin_dashboard.html', {'name':'admin_dashboard'})
