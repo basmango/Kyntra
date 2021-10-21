@@ -11,4 +11,4 @@ class SignUpView(generic.CreateView):
     template_name = 'registration/signup.html'
 
 def index(request):
-    return HttpResponse("Hello, world. Welcome to Kyntra.")
+    return render(request,'general/home.html')
