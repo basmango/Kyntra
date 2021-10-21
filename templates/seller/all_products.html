@@ -11,7 +11,7 @@
 
             <div class="input-group mb-3">
                 <input type="text" class="form-control" aria-label="Default"
-                    aria-describedby="inputGroup-sizing-default"  >
+                    aria-describedby="inputGroup-sizing-default">
             </div>
             <!--Grid column-->
 
@@ -23,15 +23,18 @@
             {% for item in products %}
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card text-center">
-                    <img src="{{item.image_uri}}" class="card-img-top " alt="...">
+                <div class="card text-center" style="height: 30rem;">
+                    <img draggable="false" src="{{item.image_uri}}" class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
                             <span class="badge bg-danger mx-1">{{item.supertag}}</span>
                         </h5>
                         <p class="card-text">{{item.description}}</p>
-                        <a href="" class="btn btn-secondary">Check Sales</a>
+                        <a href="" class="btn btn-primary">Check Sales</a>
+                        <br />
+                        <a href="" class="card-link">Edit</a>
                     </div>
+
                 </div>
             </div>
             {% endfor %}
