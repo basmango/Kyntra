@@ -26,16 +26,16 @@
 			<div class="collapse navbar-collapse" id="#navmenu">
 				<ul class="navbar-nav ms-auto">
 					<li class="nav-item">
-						<a href="" class="nav-link">Dashboard</a>
+						<a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
 					</li>
 					<li class="nav-item">
-						<a href="" class="nav-link">Buyers</a>
+						<a href="{% url 'admin_buyers' %}" class="nav-link active">Buyers</a>
 					</li>
 					<li class="nav-item">
-						<a href="#sellers" class="nav-link">Sellers</a>
+						<a href="{% url 'admin_sellers' %}" class="nav-link">Sellers</a>
 					</li>
 					<li class="nav-item">
-						<a href="#products" class="nav-link">Products</a>
+						<a href="{% url 'admin_products' %}" class="nav-link">Products</a>
 					</li>
 				</ul>
 			</div>
@@ -53,61 +53,89 @@
 
 	<section class="p-5">
 		<div class="container">
-			<div class="row text-center g-4">
-				<div class="col-md">
-					<div class="card">
-						<div class="card-header">
-							Buyers
-						</div>
-						<div class="card-body">
-							<h1 class="card-title">971593</h1>
-							<p class="card-text">Total buying customers</p>
-							<a href="#buyers" class="btn btn-primary">View all buyers</a>
+			<div class="row">
+				<div class="col-md-2">
+
+					<ul class="list-group">
+						<li class="list-group-item active" aria-current="true">All users</li>
+						<li class="list-group-item">Recently joined</li>
+						<li class="list-group-item">Option 3</li>
+						<li class="list-group-item">Option 4</li>
+						<li class="list-group-item">Option 5</li>
+					</ul>
+
+				</div>
+
+				<div class="col-md-10">
+					<div class="row">
+						<div class="col-md-12">
+
+							<ul class="list-group list-group-flush ">
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												User Id: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="" class="btn btn-danger">Remove</a>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												User Id: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="" class="btn btn-danger">Remove</a>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												User Id: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="" class="btn btn-danger">Remove</a>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												User Id: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="" class="btn btn-danger">Remove</a>
+										</div>
+									</div>
+								</li>
+							</ul>
 						</div>
 					</div>
 				</div>
-				<!-- <div class="col-md">
-					<div class="card">
-						<div class="card-header">
-							Sellers
-						</div>
-						<div class="card-body">
-							<h1 class="card-title">447</h1>
-							<p class="card-text">Total registered merchants</p>
-							<a href="#sellers" class="btn btn-primary">View all sellers</a>
-						</div>
 
-						<div class="card-body">
-
-							<h1 class="card-title">15</h1>
-							<p class="card-text">Pending applications</p>
-							<a href="#sellers" class="btn btn-primary">View all applications</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-md">
-					<div class="card">
-						<div class="card-header">
-							Products
-						</div>
-						<div class="card-body">
-							<h1 class="card-title">9924</h1>
-							<p class="card-text">Total product listings</p>
-							<a href="#products" class="btn btn-primary">View all products</a>
-						</div>
-					</div>
-				</div> -->
 			</div>
-		</div>
-		</div>
 		</div>
 	</section>
 
-
-	<!-- <div class="container"> -->
-	<!-- <h1>Kyntra [Admin]</h1>
-		<h2>Dashboard</h2> -->
-	<!-- </div> -->
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
