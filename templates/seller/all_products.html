@@ -1,0 +1,43 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<main class="mt-5 pt-4">
+    <div class="container dark-grey-text">
+
+        <!--Grid row-->
+        <div class="row d-flex justify-content-center wow fadeIn">
+
+            <!--Grid column-->
+
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default"  >
+            </div>
+            <!--Grid column-->
+
+        </div>
+        <!--Grid row-->
+
+        <!--Grid row-->
+        <div class="row wow fadeIn">
+            {% for item in products %}
+            <!--Grid column-->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card text-center">
+                    <img src="{{item.image_uri}}" class="card-img-top " alt="...">
+                    <div class="card-body ">
+                        <h5>{{item.name}}
+                            <span class="badge bg-danger mx-1">{{item.supertag}}</span>
+                        </h5>
+                        <p class="card-text">{{item.description}}</p>
+                        <a href="" class="btn btn-secondary">Check Sales</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!--Grid row-->
+
+    </div>
+</main>
+{% endblock %}
