@@ -1,6 +1,52 @@
 {% extends "admin/admin_base.html" %}
 
 {% block content %}
+
+<!-- Modal -->
+<div class="modal fade" id="locModal" tabindex="-1" role="dialog" aria-labelledby="locModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locModalLabel">Add Product</h5>
+
+            </div>
+            <div class="modal-body">
+                <form action="" id="w-form">
+                    <div class="form-group">
+                        <label for="product-title"> Product Title</label>
+                        <input type="text" class="form-control mb-3" id="product-title">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price"> Price </label>
+
+                        <div class="input-group mb-3">
+
+                            <span class="input-group-text">Rs.</span>
+                            <input type="number" class="form-control" id="product-price"
+                                aria-label="Amount (to the nearest dollar)">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-decription"> Description </label>
+                        <input type="text" class="form-control mb-3" id="product-decription">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="product-images"> Selct Images </label>
+
+                        <input type="file" class="form-control" id="product-images" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="w-change-close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="w-change-btn" type="button" class="btn btn-primary">Add Product</button>
+            </div>
+        </div>
+    </div>
+</div>
 <main class="mt-5 pt-4">
     <div class="container dark-grey-text">
 
@@ -13,7 +59,8 @@
                 <input type="text" class="form-control" aria-label="Default"
                     aria-describedby="inputGroup-sizing-default">
 
-                <button class="btn btn-primary mx-2"  >Add</button>
+                <button id="add-project-button" type="button" class="btn btn-primary mx-2" data-toggle="modal"
+                    data-target="#locModal">Add</button>
             </form>
             <!--Grid column-->
 
@@ -34,7 +81,7 @@
                         <p class="card-text">{{item.description}}</p>
                         <a href="" class="btn btn-primary">Check Sales</a>
                         <br />
-                        <a href="" class="card-link">Edit</a>
+                        <a href="" id="edit-product-button" class="card-link">Edit</a>
                     </div>
 
                 </div>
@@ -45,4 +92,24 @@
 
     </div>
 </main>
+<script type="text/javascript">
+    var locModal = document.getElementById('locModal');
+    var btnclose = document.getElementById('w-change-close');
+    var btnShow = document.getElementById('add-project-button');
+    
+
+    //show the modal
+    btnShow.addEventListener('click', (e) => {
+        locModal.style.display = "block";
+        locModal.style.paddingRight = "17px";
+        locModal.className = "modal fade show";
+    });
+    
+    //hide the modal
+    btnclose.addEventListener('click', (e) => {
+        locModal.style.display = "none";
+        locModal.className = "modal fade";
+    });
+
+</script>
 {% endblock %}
