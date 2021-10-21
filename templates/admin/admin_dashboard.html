@@ -1,0 +1,64 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+
+	<section class="bg-secondary text-light py-5 text-center">
+		<div class="container">
+
+			<h1>Dashboard</h1>
+
+		</div>
+	</section>
+
+
+	<section class="p-5">
+		<div class="container">
+			<div class="row text-center g-4">
+				<div class="col-md">
+					<div class="card">
+						<div class="card-header">
+							Buyers
+						</div>
+						<div class="card-body">
+							<h1 class="card-title">971593</h1>
+							<p class="card-text">Total buying customers</p>
+							<a href="{% url 'admin_buyers' %}" class="btn btn-primary">View all buyers</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md">
+					<div class="card">
+						<div class="card-header">
+							Sellers
+						</div>
+						<div class="card-body">
+							<h1 class="card-title">447</h1>
+							<p class="card-text">Total registered merchants</p>
+							<a href="{% url 'admin_sellers' %}" class="btn btn-primary">View all sellers</a>
+						</div>
+
+						<div class="card-body">
+
+							<h1 class="card-title">15</h1>
+							<p class="card-text">Pending applications</p>
+							<a href="{% url 'admin_sellers' %}" class="btn btn-primary">View all applications</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md">
+					<div class="card">
+						<div class="card-header">
+							Products
+						</div>
+						<div class="card-body">
+							<h1 class="card-title">9924</h1>
+							<p class="card-text">Total product listings</p>
+							<a href="{% url 'admin_products' %}" class="btn btn-primary">View all products</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+{% endblock %}

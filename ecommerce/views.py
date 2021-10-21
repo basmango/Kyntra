@@ -12,3 +12,15 @@ class SignUpView(generic.CreateView):
 
 def index(request):
     return render(request,'general/home.html')
+
+def admin_dashboard(request):
+    return render(request,'admin/admin_dashboard.html', {'name':'admin_dashboard'})
+
+def admin_buyers(request):
+    return render(request,'admin/admin_buyers.html', {'name':'admin_buyers'})
+
+def admin_sellers(request):
+    return render(request,'admin/admin_sellers.html', {'name':'admin_sellers'})
+
+def admin_products(request):
+    return render(request,'admin/admin_products.html', {'name':'admin_products'})
