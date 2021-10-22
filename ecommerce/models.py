@@ -35,7 +35,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     price = models.FloatField()
     description = models.TextField()
@@ -68,7 +68,7 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ManyToOneRel(Cart, on_delete=models.CASCADE)
+    cart = models.ManyToOneRel(to=Cart, field_name='cart',field=Cart.id, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
 
@@ -93,7 +93,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ManyToOneRel(Order, on_delete=models.CASCADE)
+    order = models.ManyToOneRel(to=Order, field_name='order', field=Order.id, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
 
