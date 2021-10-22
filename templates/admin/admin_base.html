@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %}
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+	<div class="container-lg">
+		<a href="#" class="navbar-brand">Kyntra <span class="badge bg-secondary">Admin</span></a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="#navmenu">
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item">
+					<a href="{% url 'admin_dashboard' %}" class="nav-link active">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'admin_buyers' %}" class="nav-link">Buyers</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'admin_sellers' %}" class="nav-link">Sellers</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'admin_products' %}" class="nav-link">Products</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+{% block content %}
+{% endblock %}
+
+{% endblock %}

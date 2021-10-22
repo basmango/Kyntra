@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous" />
+	<link rel="stylesheet" href="styles.css" />
+
+	<title>Dashboard</title>
+
+</head>
+
+<body>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+		<div class="container-lg">
+			<a href="#" class="navbar-brand">Kyntra <span class="badge bg-secondary">Admin</span></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="#navmenu">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'admin_buyers' %}" class="nav-link">Buyers</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'admin_sellers' %}" class="nav-link active">Sellers</a>
+					</li>
+					<li class="nav-item">
+						<a href="{% url 'admin_products' %}" class="nav-link">Products</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Showcase -->
+	<!-- <section class="bg-secondary text-light py-4 text-center">
+		<div class="container">
+
+			<h1>Sellers</h1>
+
+		</div>
+	</section> -->
+
+	<section class="p-5">
+		<div class="container">
+
+			<div class="row">
+
+				<div class="col-md-3">
+					<div class="card">
+						<div class="card-header">
+							<b>Applications</b>
+						</div>
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex justify-content-between align-items-start active">
+								Pending
+								<span class="badge bg-light rounded-pill text-dark">5</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								Approved
+								<span class="badge bg-primary rounded-pill">14</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								Rejected
+								<span class="badge bg-primary rounded-pill">0</span>
+							</li>
+						</ul>
+					</div>
+					<br>
+					<div class="card">
+						<div class="card-header">
+							<b>Users</b>
+						</div>
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								All users
+								<span class="badge bg-primary rounded-pill">5</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								Recently joined
+								<span class="badge bg-primary rounded-pill">5</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-9">
+					<div class="row">
+						<div class="col-md-12">
+
+							<ul class="list-group list-group-flush ">
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												Application ID: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View documents</a>
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-success">Approve</button>
+												<button type="button" class="btn btn-danger">Reject</button>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												Application ID: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View documents</a>
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-success">Approve</button>
+												<button type="button" class="btn btn-danger">Reject</button>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												Application ID: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View documents</a>
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-success">Approve</button>
+												<button type="button" class="btn btn-danger">Reject</button>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li class="list-group-item">
+									<div class="row no-gutters">
+										<div class="col">
+											<p><b>User Name</b>
+												<br />
+												Application ID: 12345678
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View documents</a>
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-success">Approve</button>
+												<button type="button" class="btn btn-danger">Reject</button>
+											</div>
+										</div>
+									</div>
+								</li>
+
+
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+
+	<!-- <div class="container"> -->
+	<!-- <h1>Kyntra [Admin]</h1>
+		<h2>Dashboard</h2> -->
+	<!-- </div> -->
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>
