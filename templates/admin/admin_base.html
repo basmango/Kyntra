@@ -3,7 +3,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
 	<div class="container-lg">
-		<a href="#" class="navbar-brand">Kyntra <span class="badge bg-secondary">Admin</span></a>
+		<a href="{% url 'admin_dashboard' %}" class="navbar-brand">Kyntra <span class="badge bg-secondary">Admin</span></a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -11,16 +11,16 @@
 		<div class="collapse navbar-collapse" id="#navmenu">
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item">
-					<a href="{% url 'admin_dashboard' %}" class="nav-link active">Dashboard</a>
+					<a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.path == '/kyntra/admin/' %} active {% endif %}">Dashboard</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_buyers' %}" class="nav-link">Buyers</a>
+					<a href="{% url 'admin_buyers' %}" class="nav-link {% if request.path == '/kyntra/admin/buyers/' %} active {% endif %}">Buyers</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_sellers' %}" class="nav-link">Sellers</a>
+					<a href="{% url 'admin_sellers' %}" class="nav-link {% if request.path == '/kyntra/admin/sellers/' %} active {% endif %}">Sellers</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_products' %}" class="nav-link">Products</a>
+					<a href="{% url 'admin_products' %}" class="nav-link {% if request.path == '/kyntra/admin/products/' %} active {% endif %}">Products</a>
 				</li>
 			</ul>
 		</div>
