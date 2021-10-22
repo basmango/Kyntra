@@ -79,3 +79,5 @@ def seller_all_products(request):
    
     ]
     return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
+def seller_registration(request):
+    return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
