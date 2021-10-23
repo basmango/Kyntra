@@ -5,35 +5,56 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse
 
-from ecommerce.models import UserProfile
-from .forms import SignUpForm
+from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
 
 def update_user_data(user, phone):
     UserProfile.objects.update_or_create(user=user, defaults={'phone': phone})
- 
+
 def signup(request):
+    return render(request, 'registration/signup.html')
+
+
+def buyer_signup(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = BuyerSignUpForm(request.POST)
+        address_form = AddressForm(request.POST)
+        if form.is_valid() and address_form.is_valid():
+            user = form.save()
+            address = address_form.save()
+            user.refresh_from_db()
+            Buyer.objects.create(user=user, address=address)
+            user.save()
+            address.save()
+            raw_password = form.cleaned_data.get('password1')
+            # login user after signing up
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)            
+            return redirect('index')
+    else:
+        form = BuyerSignUpForm()
+        address_form = AddressForm()
+
+    return render(request,'registration/buyer_signup.html',{'form': form, "address_form": address_form})
+
+def seller_signup(request):
+    if request.method == 'POST':
+        form = SellerSignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
             user.refresh_from_db()
-            update_user_data(user, form.cleaned_data.get('phone'))
+            Seller.objects.create(user=user, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'))
             user.save()
             raw_password = form.cleaned_data.get('password1')
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
             login(request, user)
-            
-            return redirect('home')
+            # TODO Change to seller registration for document upload etc.
+            return redirect('index')
     else:
-        form = SignUpForm()
+        form = SellerSignUpForm()
 
-    return render(request, 'registration/signup.html', {'form': form})
-
-# class SignUpView(generic.CreateView):
-#     form_class = UserCreationForm
-#     success_url = reverse_lazy('login')
-#     template_name = 'registration/signup.html'
+    return render(request,'registration/seller_signup.html', {'form': form})
 
 
 def index(request):

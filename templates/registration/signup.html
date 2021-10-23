@@ -12,32 +12,15 @@
           <div class="card-body p-5 text-center">
             <div class="mb-md-3 mt-md-2 pb-2">
               <h2 class="fw-bold mb-2 text-uppercase">Sign Up</h2>
-              <form method="post" action="{% url 'signup' %}">
-                {% csrf_token %}
-                {% for field in form %}
-                <div class="form-floating form-white mb-1 text-black py-2">
-                  <div class="text-start text-white">
-                    {{ field.label_tag }}
-                  </div>
-                  <div class="pt-2 text-start d-flex">
-                    {{field|add_class:'form-control'}}
-                    {% if field.help_text %}
-                    <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
-                      title="{{field.help_text}}">
-                      <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto" style="color: white;"></i>
-                    </a>
-                    {% endif %}
-                  </div>
 
-                  {% for error in field.errors %}
-                  <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
-                  {% endfor %}
-                </div>
-                {% endfor %}
-
-                <input class="btn btn-outline-light btn-lg px-5 mt-5 pt-lg-2" type="submit" value="Sign Up" />
-              </form>
-
+              <p class="mt-5 pt-lg-2">Are you a </p>
+              <a class="btn btn-outline-light btn-lg px-5 mt-1" href="{% url 'buyer_signup'%}">
+                Buyer
+              </a>
+              <p class="mt-2 pt-lg-2 text-white-50"> OR </p>
+              <a class="btn btn-outline-light btn-lg px-5 mt-1" href="{% url 'seller_signup'%}">
+                Seller
+              </a>
 
               <div class="d-flex justify-content-center text-center mt-4 pt-1">
                 <a href="#!" class="text-white"><i class="fab fa-facebook-f fa-lg"></i></a>

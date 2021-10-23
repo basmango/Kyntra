@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 
-from ecommerce.views import signup
+from ecommerce.views import signup, buyer_signup, seller_signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),
     path('accounts/signup/', signup, name="signup" ),
+    path('accounts/signup/buyer', buyer_signup, name="buyer_signup" ),
+    path('accounts/signup/seller', seller_signup, name="seller_signup" ),
     path('kyntra/', include('ecommerce.urls')),
     ]

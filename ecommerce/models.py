@@ -3,10 +3,21 @@ from django.conf import settings
 # Create your models here.
 
 
+class ShippingAddress(models.Model):
+    address1 = models.CharField(max_length=120)
+    address2 = models.CharField(max_length=120)
+    city = models.CharField(max_length=120)
+    # TODO Change to dropdown fields for states and countries
+    country = models.CharField(max_length=120)
+    zipcode = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.address1 + self.address2 + self.country
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, blank=True, null=True)
+    # phone = models.CharField(max_length=20, blank=True, null=True)
     photo_url = models.ImageField(
         upload_to="user_profile/", blank=True, null=True)
 
@@ -15,15 +26,16 @@ class UserProfile(models.Model):
 
 
 class Buyer(UserProfile):
-    address = models.CharField(max_length=100, blank=True, null=True)
-
+    address = models.OneToOneField(ShippingAddress, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Buyer " + self.user.username
 
 class Seller(UserProfile):
     company_name = models.CharField(max_length=100, blank=True, null=True)
     gst_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return "Seller " + self.user.username
 
 
 class Category(models.Model):
