@@ -80,7 +80,7 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ManyToOneRel(to=Cart, field_name='cart',field=Cart.id, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
 
@@ -105,7 +105,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ManyToOneRel(to=Order, field_name='order', field=Order.id, on_delete=models.CASCADE)
+    order =  models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
 

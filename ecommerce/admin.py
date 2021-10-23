@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ecommerce.models import Buyer, Cart, CartItem, Category, Order, OrderItem, Product, Seller, ShippingAddress
+from ecommerce.models import Buyer, Cart, CartItem, Category, Order, OrderItem, Product, Seller, ShippingAddress, ProductImage
 
 # Register your models here.
 
@@ -13,3 +13,5 @@ admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Order)
 admin.site.register(OrderItem)
+admin.site.register(ProductImage)
+
