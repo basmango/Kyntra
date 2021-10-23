@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#user-uploaded-content
+user_profile/
+product_images/
