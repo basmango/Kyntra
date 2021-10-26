@@ -131,3 +131,4 @@ dmypy.json
 #user-uploaded-content
 user_profile/
 product_images/
+media/
