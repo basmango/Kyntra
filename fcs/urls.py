@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-
-from ecommerce.views import signup, buyer_signup, seller_signup
+from django.conf import settings
+from django.conf.urls.static import static
+from ecommerce.views import SignUpView, signup, buyer_signup, seller_signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +26,4 @@ urlpatterns = [
     path('accounts/signup/buyer', buyer_signup, name="buyer_signup" ),
     path('accounts/signup/seller', seller_signup, name="seller_signup" ),
     path('kyntra/', include('ecommerce.urls')),
-    ]
+    ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -4,9 +4,52 @@ from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse
-
-from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile
+from django.views.generic.list import ListView
+from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
+from django.db.models import Q
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+
+
+class SearchProductListView(ListView):
+    model = Product
+    paginate_by = 15
+    template_name = 'general/home.html'
+
+    def get_queryset(self): # new
+        query = self.request.GET.get('product')
+        if not(query):
+            return  Product.objects.all()
+        object_list = Product.objects.filter(
+            Q(name__icontains=query) )
+        
+        return object_list
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('product')
+        if query==None:
+            query=""
+            
+        context['title'] = f"Search results for '{query}' "
+        context['additional_q_params_for_pagination']  = f"product={query}"
+        return context
+    
+class ProductListView(ListView):
+    model = Product
+    paginate_by = 10
+    template_name = 'general/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Product Catalog"
+        return context
+        
+class SignUpView(generic.CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'registration/signup.html'
+
+
 
 def update_user_data(user, phone):
     UserProfile.objects.update_or_create(user=user, defaults={'phone': phone})
