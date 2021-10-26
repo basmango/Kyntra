@@ -1,0 +1,94 @@
+{% extends 'registration/registration_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Sign Up | Kyntra{% endblock %}
+
+{% block content %}
+<section class="gradient-custom">
+    <div class="container py-5 h-75">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white" style="border-radius: 1rem">
+                    <div class="card-body p-5 text-center">
+                        <div class="mb-md-3 mt-md-2 pb-2">
+                            <h2 class="fw-bold mb-2 text-uppercase">Sign Up</h2>
+                            <form method="post" action="{% url 'buyer_signup' %}">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                <div class="form-floating form-white mb-1 text-black py-2">
+                                    <div class="text-start text-white">
+                                        {{ field.label_tag }}
+                                    </div>
+                                    <div class="pt-2 text-start d-flex">
+                                        {{field|add_class:'form-control'}}
+                                        {% if field.help_text %}
+                                        <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            data-bs-html="true" title="{{field.help_text}}">
+                                            <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto"
+                                                style="color: white;"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+
+                                    {% for error in field.errors %}
+                                    <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endfor %}
+                                <h2>Address</h2>
+                                {% for field in address_form %}
+                                <div class="form-floating form-white mb-1 text-black py-2">
+                                    <div class="text-start text-white">
+                                        {{ field.label_tag }}
+                                    </div>
+                                    <div class="pt-2 text-start d-flex">
+                                        {{field|add_class:'form-control'}}
+                                        {% if field.help_text %}
+                                        <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            data-bs-html="true" title="{{field.help_text}}">
+                                            <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto"
+                                                style="color: white;"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+
+                                    {% for error in field.errors %}
+                                    <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endfor %}
+
+
+                                <input class="btn btn-outline-light btn-lg px-5 mt-5 pt-lg-2" type="submit"
+                                    value="Sign Up" />
+                            </form>
+
+
+                            <div class="d-flex justify-content-center text-center mt-4 pt-1">
+                                <a href="#!" class="text-white"><i class="fab fa-facebook-f fa-lg"></i></a>
+                                <a href="#!" class="text-white"><i class="fab fa-twitter fa-lg mx-4 px-2"></i></a>
+                                <a href="#!" class="text-white">
+                                    <i class="fab fa-google fa-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="mb-0">
+                                Sign up as a
+                                <a href="{% url 'seller_signup' %}" class="text-white-50 fw-bold"> seller</a>
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="mb-0">
+                                Have an account?
+                                <a href="{% url 'login' %}" class="text-white-50 fw-bold">Login</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

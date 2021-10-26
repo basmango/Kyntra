@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from ecommerce.views import SignUpView
+from ecommerce.views import SignUpView, signup, buyer_signup, seller_signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),
-    path('accounts/signup/',SignUpView.as_view(),name="signup" ),
+    path('accounts/signup/', signup, name="signup" ),
+    path('accounts/signup/buyer', buyer_signup, name="buyer_signup" ),
+    path('accounts/signup/seller', seller_signup, name="seller_signup" ),
     path('kyntra/', include('ecommerce.urls')),
     ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
