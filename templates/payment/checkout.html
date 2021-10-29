@@ -1,0 +1,25 @@
+<html>
+
+<head>
+    {% load static %}
+    <title>Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    {% comment %} <script src="./checkout.js"></script> {% endcomment %}
+</head>
+
+<body>
+    CHECKING OUT
+    <form id="payment-form" data-clientSecret="{{client_secret}}" data-pubKey="{{public_key}}">
+        <div id="payment-element">
+            <!-- Elements will create form elements here -->
+        </div>
+        <button id="submit">Submit</button>
+        <div id="error-message">
+            <!-- Display error message to your customers here -->
+        </div>
+    </form>
+
+    <script src="{% static 'js/checkout.js' %}"></script>
+</body>
+
+</html>

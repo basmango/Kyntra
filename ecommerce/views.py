@@ -8,7 +8,8 @@ from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
 from django.db.models import Q
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
-
+import stripe
+from django.conf import settings
 
 class SearchProductListView(ListView):
     model = Product
@@ -171,3 +172,40 @@ def seller_all_products(request):
     return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+
+
+### PAYMENTS
+
+def checkout(request):
+    if request.method == 'GET':
+        amount = 10000 # To be fetched from cart
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        res = stripe.PaymentIntent.create(
+                amount=amount,
+                currency='inr',
+                payment_method_types=['card'],
+                receipt_email='jenny.rosen@example.com', # to be fetched from request.user
+            )
+        # store payment intent as transaction id in order and then confirm payment when on payment_complete/ url.
+        # print(res)
+    return render(request, 'payment/checkout.html', {'client_secret': res.client_secret, 'public_key': settings.STRIPE_PUBLIC_KEY}) 
+
+
+def payment_complete(request):
+    if request.method == 'GET':
+        payment_intent = request.GET.get('payment_intent')
+        payment_intent_client_secret = request.GET.get('payment_intent_client_secret')
+        redirect_status = request.GET.get('redirect_status')
+        
+        # authenticate here that the user is the same as the one who made the payment
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        obj = stripe.PaymentIntent.retrieve(payment_intent)
+        if obj.status == 'succeeded':
+            return render(request, 'payment/payment_success.html')
+        elif obj.status == "processing":
+            return render(request, 'payment/payment_processing.html')
+        elif obj.status == "requires_payment_method":
+            return render(request, 'payment/payment_failed.html')
+        else:
+            return render(request, 'payment/payment_failed.html')
+    

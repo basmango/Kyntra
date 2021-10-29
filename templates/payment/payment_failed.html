@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+{% load static %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<body>
+
+
+    <div class="jumbotron text-center">
+        <h1 class="display-3">Payment Failed!</h1>
+        <p class="lead"><strong> Unfortunately, your payment was unsuccessful.
+            </strong> If your bank has deducted money from your account, it will be refunded within 72 hours. If not,
+            please contact your bank.
+        </p>
+        <hr>
+        <p>
+            Having trouble? <a href="">Contact us</a>
+        </p>
+        <p class="lead">
+            <a class="btn btn-primary btn-sm" href="{% url 'checkout' %}" role="button">Finish your payment</a>
+        </p>
+    </div>
+
+</body>
+
+{% endblock %}
