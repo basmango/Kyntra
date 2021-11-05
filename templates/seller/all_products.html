@@ -31,11 +31,12 @@
                         <label for="product-decription"> Description </label>
                         <input type="text" class="form-control mb-3" id="product-decription">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="product-images"> Selct Images </label>
 
-                        <input type="file" class="form-control" id="product-images" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                        <input type="file" class="form-control" id="product-images"
+                            aria-describedby="inputGroupFileAddon04" aria-label="Upload">
                     </div>
 
                 </form>
@@ -47,15 +48,12 @@
         </div>
     </div>
 </div>
-<main >
+<main>
     <div class="container dark-grey-text">
 
         <form class="d-flex my-3">
-            <input type="text" class="form-control" aria-label="Default"
-                aria-describedby="inputGroup-sizing-default">
-
-            <button  type="button" class="btn btn-success mx-2" data-toggle="modal"
-                data-target="#locModal">Search</button>
+            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <button type="button" class="btn btn-success mx-1">Search</button>
         </form>
 
         <!--Grid row-->
@@ -87,7 +85,7 @@
     var locModal = document.getElementById('locModal');
     var btnclose = document.getElementById('w-change-close');
     var btnShow = document.getElementById('add-project-button');
-    
+
 
     //show the modal
     btnShow.addEventListener('click', (e) => {
@@ -95,7 +93,7 @@
         locModal.style.paddingRight = "17px";
         locModal.className = "modal fade show";
     });
-    
+
     //hide the modal
     btnclose.addEventListener('click', (e) => {
         locModal.style.display = "none";
