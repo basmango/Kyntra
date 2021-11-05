@@ -1,0 +1,41 @@
+{% extends "base_generic.html" %}
+
+{% block navigation %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a href="#" class="navbar-brand">Kyntra <span class="badge bg-secondary">Seller</span> </a>
+    <!--Grid row-->
+    <div class="row d-flex justify-content-center wow fadeIn">
+
+      <!--Grid column-->
+
+      <form class="d-flex">
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+
+        <button id="add-project-button" type="button" class="btn btn-primary mx-2" data-toggle="modal"
+          data-target="#locModal">New_Product</button>
+      </form>
+      <!--Grid column-->
+
+    </div>
+    <!--Grid row-->
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex;"></div>
+
+<!--
+<div id ="filter-box" style = "margin-top:100px;margin-left:20px;background-color:#f2f3f4;width:25%;height:200px;"><h2 style="text-align:center;">Filter</h2></div>
+<div id ="filter-box"  style = "background-color:#f2f3f4;width:25%;"></div>
+-->
+<div id="content-box">
+
+  {% block general_content %}
+
+  {% endblock %}
+
+</div>
+
+{% endblock %}
