@@ -19,49 +19,21 @@
 								All Products
 								<span
 									class="badge rounded-pill {% if option  == 'all' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
+									{{product_count.0}}
 								</span>
 							</a>
-							<a href="/kyntra/admin/products/fashion"
-								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'fashion' %} active {% endif %}">
-								Fashion
+							{% load index %}
+							{% for category in categories %}
+							<a href="/kyntra/admin/products/{{category.name}}"
+								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == category.name %} active {% endif %}">
+								{{category.name}}
 								<span
-									class="badge rounded-pill {% if option  == 'fashion' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
+									class="badge rounded-pill {% if option  == category.name %} bg-light text-dark {% else %} bg-primary {% endif %}">
+									{{product_count|index:forloop.counter}}
+
 								</span>
 							</a>
-							<a href="/kyntra/admin/products/electronics"
-								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'electronics' %} active {% endif %}">
-								Electronics
-								<span
-									class="badge rounded-pill {% if option  == 'electronics' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
-								</span>
-							</a>
-							<a href="/kyntra/admin/products/homedecor"
-								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'homedecor' %} active {% endif %}">
-								Home Decor
-								<span
-									class="badge rounded-pill {% if option  == 'homedecor' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
-								</span>
-							</a>
-							<a href="/kyntra/admin/products/appliances"
-								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'appliances' %} active {% endif %}">
-								Appliances
-								<span
-									class="badge rounded-pill {% if option  == 'appliances' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
-								</span>
-							</a>
-							<a href="/kyntra/admin/products/cosmetics"
-								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'cosmetics' %} active {% endif %}">
-								Cosmetics
-								<span
-									class="badge rounded-pill {% if option  == 'cosmetics' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-									{{product_count}}
-								</span>
-							</a>
+							{% endfor %}
 						</div>
 					</div>
 

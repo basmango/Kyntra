@@ -134,7 +134,6 @@ def admin_sellers(request, option="all"):
 		'seller_count':seller_count
 		})
 
-
 def admin_products(request, option="all"):
 	products = []
 	product_count = []
@@ -147,7 +146,7 @@ def admin_products(request, option="all"):
 	for c in categories:
 		i+=1
 		products.append(Product.objects.filter(category=Category.objects.filter(name=c.name).get()))
-		if c.name.lower() == option:
+		if c.name == option:
 			curr = i
 	# product_count = len(sellers)
 	for p in products:
@@ -159,7 +158,8 @@ def admin_products(request, option="all"):
 		'name': 'admin_products',
 		'option':option, 
 		'products':products[curr], 
-		'product_count':product_count
+		'product_count':product_count,
+		'categories':categories,
 		})
 
 
