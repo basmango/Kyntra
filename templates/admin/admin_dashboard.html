@@ -14,7 +14,7 @@
 							Buyers
 						</div>
 						<div class="card-body">
-							<h1 class="card-title">971593</h1>
+							<h1 class="card-title">{{buyer_count}}</h1>
 							<p class="card-text">Total buying customers</p>
 							<a href="{% url 'admin_buyers' %}" class="btn btn-primary">View all buyers</a>
 						</div>
@@ -26,14 +26,14 @@
 							Sellers
 						</div>
 						<div class="card-body">
-							<h1 class="card-title">447</h1>
+							<h1 class="card-title">{{seller_count}}</h1>
 							<p class="card-text">Total registered merchants</p>
 							<a href="{% url 'admin_sellers' %}" class="btn btn-primary">View all sellers</a>
 						</div>
 
 						<div class="card-body">
 
-							<h1 class="card-title">15</h1>
+							<h1 class="card-title">{{pending_count}}</h1>
 							<p class="card-text">Pending applications</p>
 							<a href="/kyntra/admin/sellers/pending" class="btn btn-primary">View all applications</a>
 						</div>
@@ -45,7 +45,7 @@
 							Products
 						</div>
 						<div class="card-body">
-							<h1 class="card-title">9924</h1>
+							<h1 class="card-title">{{product_count}}</h1>
 							<p class="card-text">Total product listings</p>
 							<a href="{% url 'admin_products' %}" class="btn btn-primary">View all products</a>
 						</div>

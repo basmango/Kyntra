@@ -31,13 +31,6 @@
 								{{buyer_count}}
 							</span>
 						</a>
-						<a href="/kyntra/admin/buyers/recent"
-							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'recent' %} active {% endif %}">
-							Recently joined
-							<span class="badge rounded-pill {% if option  == 'recent' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-								{{buyer_count}}
-							</span>
-						</a>
 					</div>
 				</div>
 
@@ -48,32 +41,18 @@
 					<div class="col-md-12">
 
 						<ul class="list-group list-group-flush ">
-							{% if option == "recent" %}
-								{% for user in buyers %}
-								{% if forloop.counter < 3 %} <li class="list-group-item">
-								<div class="row">
-									<div class="col">
-										<p><b>{{user.user.username}}</b>
-											<br />
-											User Id: {{user.user.id}}
-										</p>
-									</div>
-									<div class="col-md-auto">
-										<a href="" class="btn btn-outline-primary">View details</a>
-										<a href="" class="btn btn-danger">Remove</a>
-									</div>
-								</div>
-								</li>
-								{% endif %}
-								{% endfor %}
-							{% else %}
 								{% for user in buyers %}
 								<li class="list-group-item">
 									<div class="row">
+										<div class="col-md-auto">
+											{{user.user.id}}
+										</div>
 										<div class="col">
 											<p><b>{{user.user.username}}</b>
-												<br />
-												User Id: {{user.user.id}}
+											</p>
+										</div>
+										<div class="col">
+											<p>{{user.user.email}}
 											</p>
 										</div>
 										<div class="col-md-auto">
@@ -83,8 +62,6 @@
 									</div>
 								</li>
 								{% endfor %}
-							{% endif %}
-
 
 						</ul>
 					</div>

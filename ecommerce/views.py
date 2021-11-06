@@ -106,7 +106,21 @@ def index(request):
 
 
 def admin_dashboard(request):
-	return render(request, 'admin/admin_dashboard.html', {'name': 'admin_dashboard'})
+	buyers = Buyer.objects.all()
+	sellers = Seller.objects.all()
+	pending = sellers.filter(applied = True, application_status = False )
+	products = Product.objects.all()
+	b = len(buyers)
+	s = len(sellers)
+	pen = len(pending)
+	p = len(products)
+
+	return render(request, 'admin/admin_dashboard.html', {
+		'name': 'admin_dashboard',
+		'buyer_count':b,
+		'seller_count':s,
+		'pending_count':pen,
+		'product_count':p})
 
 
 def admin_buyers(request, option = 'all'):
@@ -123,16 +137,41 @@ def admin_buyers(request, option = 'all'):
 
 def admin_sellers(request, option="all"):
 	sellers = Seller.objects.all()
-	# seller_count = len(sellers)
-	seller_count = 0
+	pending = sellers.filter(applied = True, application_status = False )
+	approved = sellers.filter(applied = True, application_status = True )
+	unapproved = sellers.filter(applied = False )
 
+	# seller_count = len(sellers)
+	seller_count = len(sellers)
+	pending_count = len(pending)
+	approved_count = len(approved)
+	unapproved_count = len(unapproved)
+
+	sellerlist = []
+	if option == 'pending':
+		sellerlist = pending
+	elif option == 'approved':
+		sellerlist = approved
+	elif option == 'unapproved':
+		sellerlist = unapproved
+	else:
+		sellerlist = sellers
 
 	return render(request, 'admin/admin_sellers.html', {
 		'name': 'admin_sellers', 
 		'option':option, 
-		'sellers':sellers, 
-		'seller_count':seller_count
+		'sellers':sellerlist, 
+		'seller_count':seller_count,
+		'pending_count':pending_count,
+		'approved_count':approved_count,
+		'unapproved_count':unapproved_count,
 		})
+
+# def admin_sellerapplication	(request):
+# 	if request.method == "POST":
+# 		request.
+# 	# return admin_sellers(request, )
+
 
 def admin_products(request, option="all"):
 	products = []

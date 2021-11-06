@@ -23,14 +23,6 @@
 								{{seller_count}}
 							</span>
 						</a>
-						<a href="/kyntra/admin/sellers/recent"
-							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'recent' %} active {% endif %}">
-							Recently joined
-							<span
-								class="badge rounded-pill {% if option  == 'recent' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-								{{seller_count}}
-							</span>
-						</a>
 					</div>
 				</div>
 
@@ -46,7 +38,7 @@
 							Pending
 							<span
 								class="badge rounded-pill {% if option  == 'pending' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-								{{seller_count}}
+								{{pending_count}}
 							</span>
 						</a>
 						<a href="/kyntra/admin/sellers/approved"
@@ -54,15 +46,15 @@
 							Approved
 							<span
 								class="badge rounded-pill {% if option  == 'approved' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-								{{seller_count}}
+								{{approved_count}}
 							</span>
 						</a>
-						<a href="/kyntra/admin/sellers/rejected"
-							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'rejected' %} active {% endif %}">
-							Rejected
+						<a href="/kyntra/admin/sellers/unapproved"
+							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'unapproved' %} active {% endif %}">
+							Unapproved
 							<span
-								class="badge rounded-pill {% if option  == 'rejected' %} bg-light text-dark {% else %} bg-primary {% endif %}">
-								{{seller_count}}
+								class="badge rounded-pill {% if option  == 'unapproved' %} bg-light text-dark {% else %} bg-primary {% endif %}">
+								{{unapproved_count}}
 							</span>
 						</a>
 					</div>
@@ -78,17 +70,26 @@
 							{% for seller in sellers %}
 								<li class="list-group-item">
 									<div class="row">
+										<div class="col-md-auto">
+											{{seller.id}}
+										</div>
 										<div class="col">
 											<p><b>{{seller.user.username}}</b>
 												<br />
-												Seller Id: {{seller.user.id}}
+												{{seller.company_name}}
+											</p>
+										</div>
+										<div class="col">
+											<p>
+												{{seller.user.email}}
 											</p>
 										</div>
 										<div class="col-md-auto">
 											<a href="" class="btn btn-outline-primary">View documents</a>
+											<!-- TODO: Correct this -->
 											<div class="btn-group" role="group" aria-label="Basic example">
-												<button type="button" class="btn btn-success">Approve</button>
-												<button type="button" class="btn btn-danger">Reject</button>
+												<button type="submit" name="approve" class="btn btn-success" >Approve</button>
+												<button type="submit" name="reject" class="btn btn-danger">Reject</button>
 											</div>
 										</div>
 									</div>
@@ -108,3 +109,9 @@
 
 
 {% endblock %}
+
+{% comment %}
+<!-- <form action="{% url 'admin_sellerapplication' %}" method="post">
+	{% csrf_token %}
+</form> -->
+{% endcomment %}
