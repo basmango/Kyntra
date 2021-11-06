@@ -1,3 +1,4 @@
+from django.db.models.deletion import PROTECT
 from django.shortcuts import redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
@@ -7,7 +8,7 @@ from django.http import HttpResponse, request
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm
 
 
 class SearchProductListView(ListView):
@@ -121,22 +122,6 @@ def admin_products(request):
     return render(request, 'admin/admin_products.html', {'name': 'admin_products'})
 
 
-def seller_all_products(request):
-    if  request.user.is_authenticated :
-        products=Product.objects.all()
-        print(request.user)
-        return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
-    else:
-        return HttpResponse("404")
-
-
-def seller_search_product(request):
-    if  request.user.is_authenticated :
-        query = request.GET['query']        
-        filtered_products=Product.objects.filter(name__icontains=query)
-        return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":filtered_products, "query":query})
-    else:
-        return HttpResponse("404")
     # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
@@ -163,4 +148,13 @@ class SellerSearchView(ListView):
         context = super().get_context_data(**kwargs)
         context['query'] = "query"
         return context
+
+def addProductFormView(request):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        form.save()
+    context={
+        'form':form
+    }
+    return render(request, "seller/add_product.html", context)
     

@@ -1,0 +1,20 @@
+{% extends "seller/seller_base.html" %}
+
+{% block content %}
+
+
+<main>
+    <div class="container card mt-3 py-3 ">
+        <p class="fs-4">Add Product</p>
+        <hr/>
+        <form>
+            {%csrf_token%}
+            {{form.as_p}}
+            <div class="d-grid gap-2">
+                <input type="submit" class="btn btn-primary" value="Add New Product" />
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock %}

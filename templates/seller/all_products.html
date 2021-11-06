@@ -11,7 +11,7 @@
 
             </div>
             <div class="modal-body">
-                <form action="" id="w-form">
+                <form action="" id="w-form" >
                     <div class="form-group">
                         <label for="product-title"> Product Title</label>
                         <input type="text" class="form-control mb-3" id="product-title">
@@ -43,9 +43,7 @@
             </div>
             <div class="modal-footer">
                 <button id="w-change-close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <form action="/seller/add_product/">
-                    <button id="w-change-btn" type="button" class="btn btn-primary">Add Product</button>
-                </form>
+                <button id="w-change-btn" type="button" class="btn btn-primary">Add Product</button>
             </div>
         </div>
     </div>
@@ -59,11 +57,13 @@
 
         <!--Grid row-->
         <div class="row wow fadeIn">
-            {% for item in  object_list%}
+            {% for item in object_list%}
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card text-center">
-                    <img draggable="false" src="https://1.bp.blogspot.com/-hQIA_pkA7rk/X66x8_qa5PI/AAAAAAAACcE/Bg1TTmpv3asna2o0wB2yeU2RsJ7i-g-twCLcBGAsYHQ/w1200-h630-p-k-no-nu/diwali-soan-papdi-recipe-in-hindi-diwali-sweet.JPG" class="card-img-top " alt="...">
+                    <img draggable="false"
+                        src="https://1.bp.blogspot.com/-hQIA_pkA7rk/X66x8_qa5PI/AAAAAAAACcE/Bg1TTmpv3asna2o0wB2yeU2RsJ7i-g-twCLcBGAsYHQ/w1200-h630-p-k-no-nu/diwali-soan-papdi-recipe-in-hindi-diwali-sweet.JPG"
+                        class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
                             <span class="badge bg-danger mx-1">{{item.supertag}}</span>
