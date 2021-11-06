@@ -50,11 +50,20 @@
 								{% for product in products %}
 								<li class="list-group-item">
 									<div class="row">
-										<div class="col">
+										<div class="col-md-auto">
+										{{product.id}}
+										</div>
+										<div class="col-md-3">
 											<p><b>{{product.name}}</b>
 												<br />
-												Product Id: {{product.id}}
+												{{product.seller.user.username}}
 											</p>
+										</div>
+										<div class="col">
+											₹ {{product.price}}
+										</div>
+										<div class="col">
+											x {{product.quantity}}
 										</div>
 										<div class="col-md-auto">
 											<a href="" class="btn btn-outline-primary">View details</a>
