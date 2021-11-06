@@ -124,6 +124,7 @@ def admin_products(request):
 def seller_all_products(request):
     if  request.user.is_authenticated :
         products=Product.objects.all()
+        print(request.user)
         return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
     else:
         return HttpResponse("404")
@@ -131,7 +132,7 @@ def seller_all_products(request):
 
 def seller_search_product(request):
     if  request.user.is_authenticated :
-        query = request.GET['query']
+        query = request.GET['query']        
         filtered_products=Product.objects.filter(name__icontains=query)
         return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":filtered_products, "query":query})
     else:
@@ -139,3 +140,27 @@ def seller_search_product(request):
     # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+
+class SellerAllView(ListView):
+    model=Product
+    template_name='seller/all_products.html'
+    def get_queryset(self): # new
+        return  Product.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "All Products"
+        return context
+
+class SellerSearchView(ListView):
+    model =Product
+    template_name='seller/all_products.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        return Product.objects.filter(name__icontains=query)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = "query"
+        return context
+    
