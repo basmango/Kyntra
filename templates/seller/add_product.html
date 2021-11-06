@@ -7,7 +7,7 @@
     <div class="container card mt-3 py-3 ">
         <p class="fs-4">Add Product</p>
         <hr/>
-        <form>
+        <form method='POST'>
             {%csrf_token%}
             {{form.as_p}}
             <div class="d-grid gap-2">

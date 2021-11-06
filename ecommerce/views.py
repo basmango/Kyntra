@@ -153,6 +153,8 @@ def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):
         form.save()
+        form =AddProductForm()
+
     context={
         'form':form
     }
