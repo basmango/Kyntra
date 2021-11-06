@@ -75,74 +75,26 @@
 					<div class="col-md-12">
 
 						<ul class="list-group list-group-flush ">
-							<li class="list-group-item">
-								<div class="row no-gutters">
-									<div class="col">
-										<p><b>User Name</b>
-											<br />
-											Application ID: 12345678
-										</p>
-									</div>
-									<div class="col-md-auto">
-										<a href="" class="btn btn-outline-primary">View documents</a>
-										<div class="btn-group" role="group" aria-label="Basic example">
-											<button type="button" class="btn btn-success">Approve</button>
-											<button type="button" class="btn btn-danger">Reject</button>
+							{% for seller in sellers %}
+								<li class="list-group-item">
+									<div class="row">
+										<div class="col">
+											<p><b>{{seller.user.username}}</b>
+												<br />
+												Seller Id: {{seller.user.id}}
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View documents</a>
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-success">Approve</button>
+												<button type="button" class="btn btn-danger">Reject</button>
+											</div>
 										</div>
 									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row no-gutters">
-									<div class="col">
-										<p><b>User Name</b>
-											<br />
-											Application ID: 12345678
-										</p>
-									</div>
-									<div class="col-md-auto">
-										<a href="" class="btn btn-outline-primary">View documents</a>
-										<div class="btn-group" role="group" aria-label="Basic example">
-											<button type="button" class="btn btn-success">Approve</button>
-											<button type="button" class="btn btn-danger">Reject</button>
-										</div>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row no-gutters">
-									<div class="col">
-										<p><b>User Name</b>
-											<br />
-											Application ID: 12345678
-										</p>
-									</div>
-									<div class="col-md-auto">
-										<a href="" class="btn btn-outline-primary">View documents</a>
-										<div class="btn-group" role="group" aria-label="Basic example">
-											<button type="button" class="btn btn-success">Approve</button>
-											<button type="button" class="btn btn-danger">Reject</button>
-										</div>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row no-gutters">
-									<div class="col">
-										<p><b>User Name</b>
-											<br />
-											Application ID: 12345678
-										</p>
-									</div>
-									<div class="col-md-auto">
-										<a href="" class="btn btn-outline-primary">View documents</a>
-										<div class="btn-group" role="group" aria-label="Basic example">
-											<button type="button" class="btn btn-success">Approve</button>
-											<button type="button" class="btn btn-danger">Reject</button>
-										</div>
-									</div>
-								</div>
-							</li>
+								</li>
+							{% endfor %}
+							
 
 
 						</ul>

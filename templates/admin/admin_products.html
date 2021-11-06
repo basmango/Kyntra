@@ -38,7 +38,7 @@
 									{{product_count}}
 								</span>
 							</a>
-							<a href="/kyntra/admin/products/home"
+							<a href="/kyntra/admin/products/homedecor"
 								class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'homedecor' %} active {% endif %}">
 								Home Decor
 								<span
@@ -75,12 +75,13 @@
 						<div class="col-md-12">
 
 							<ul class="list-group list-group-flush ">
+								{% for product in products %}
 								<li class="list-group-item">
-									<div class="row no-gutters">
+									<div class="row">
 										<div class="col">
-											<p><b>Product Name</b>
+											<p><b>{{product.name}}</b>
 												<br />
-												Product Id: 12345678
+												Product Id: {{product.id}}
 											</p>
 										</div>
 										<div class="col-md-auto">
@@ -89,48 +90,8 @@
 										</div>
 									</div>
 								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
+								{% endfor %}
+								
 							</ul>
 						</div>
 					</div>

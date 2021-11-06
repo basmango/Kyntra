@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse
 from django.views.generic.list import ListView
-from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
+from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
 
@@ -111,23 +111,14 @@ def admin_dashboard(request):
 
 def admin_buyers(request, option = 'all'):
 	buyers = Buyer.objects.all()
-	# buyers = [
-	# 	{
-	# 		"username":"Samarth Saxena",
-	# 		"userid":123
-	# 	},
-	# 	{
-	# 		"username":"Rohan Jain",
-	# 		"userid":345
-	# 	},
-	# 	{
-	# 		"username":"Shashank Daima",
-	# 		"userid":678
-	# 	},
-	# ]
 	buyer_count = len(buyers)
 	# buyer_count = option
-	return render(request, 'admin/admin_buyers.html', {'name': 'admin_buyers', 'option':option, 'buyers': buyers, 'buyer_count':buyer_count})
+	return render(request, 'admin/admin_buyers.html', {
+		'name': 'admin_buyers', 
+		'option':option, 
+		'buyers': buyers, 
+		'buyer_count':buyer_count
+		})
 
 
 def admin_sellers(request, option="all"):
@@ -136,14 +127,40 @@ def admin_sellers(request, option="all"):
 	seller_count = 0
 
 
-	return render(request, 'admin/admin_sellers.html', {'name': 'admin_sellers', 'option':option, 'sellers':sellers, 'seller_count':seller_count})
+	return render(request, 'admin/admin_sellers.html', {
+		'name': 'admin_sellers', 
+		'option':option, 
+		'sellers':sellers, 
+		'seller_count':seller_count
+		})
 
 
 def admin_products(request, option="all"):
-	products = Product.objects.all()
+	products = []
+	product_count = []
+	curr = 0
+
+	products.append(Product.objects.all())
+	categories = Category.objects.all()
+
+	i=0
+	for c in categories:
+		i+=1
+		products.append(Product.objects.filter(category=Category.objects.filter(name=c.name).get()))
+		if c.name.lower() == option:
+			curr = i
 	# product_count = len(sellers)
-	product_count = 0
-	return render(request, 'admin/admin_products.html', {'name': 'admin_products','option':option, 'products':products, 'product_count':product_count})
+	for p in products:
+		product_count.append(len(p))
+
+
+	
+	return render(request, 'admin/admin_products.html', {
+		'name': 'admin_products',
+		'option':option, 
+		'products':products[curr], 
+		'product_count':product_count
+		})
 
 
 def seller_all_products(request):
