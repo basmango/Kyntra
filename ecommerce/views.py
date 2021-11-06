@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse
+from django.http import HttpResponse, request
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
 from django.db.models import Q
@@ -122,8 +122,20 @@ def admin_products(request):
 
 
 def seller_all_products(request):
-   
-    products=Product.objects.all()
-    return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
+    if  request.user.is_authenticated :
+        products=Product.objects.all()
+        return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
+    else:
+        return HttpResponse("404")
+
+
+def seller_search_product(request):
+    if  request.user.is_authenticated :
+        query = request.GET['query']
+        filtered_products=Product.objects.filter(name__icontains=query)
+        return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":filtered_products, "query":query})
+    else:
+        return HttpResponse("404")
+    # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})

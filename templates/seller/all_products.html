@@ -50,9 +50,8 @@
 </div>
 <main>
     <div class="container dark-grey-text">
-
-        <form class="d-flex my-3">
-            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <form class="d-flex my-3" method="get" action="/search">
+            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default ">
             <button type="button" class="btn btn-success mx-1">Search</button>
         </form>
 
@@ -62,7 +61,7 @@
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card text-center">
-                    <img draggable="false" src="{{item.image_uri}}" class="card-img-top " alt="...">
+                    <img draggable="false" src="{{item.}}" class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
                             <span class="badge bg-danger mx-1">{{item.supertag}}</span>

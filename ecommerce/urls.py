@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/sellers/', views.admin_sellers, name='admin_sellers'),
     path('admin/products/', views.admin_products, name='admin_products'),
     path('seller/all_products/', views.seller_all_products, name='seller_all_products'),
+    path('seller/all_products/search', views.seller_search_product, name='seller_searched_products'),
     path('seller/registration/', views.seller_registration, name='seller_registration'),
     path('search/',views.SearchProductListView.as_view(),name="search_results")
 ]  
