@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, request
 from django.views.generic.list import ListView
-from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
+from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product
 from django.db.models import Q
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm
 
@@ -152,9 +152,9 @@ class SellerSearchView(ListView):
 def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):
-        # form["seller"]= request.user.id
         model =form.save(commit=False)
         model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        
         model.save()
         form =AddProductForm()
 

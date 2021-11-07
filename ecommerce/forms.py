@@ -34,16 +34,17 @@ class AddressForm(forms.ModelForm):
 
 
 class AddProductForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(AddProductForm, self).__init__(*args, **kwargs)
-        
+    # submit_images = forms.ImageField(widget=forms.FileInput(attrs={'multiple':True}), required=True)
     class Meta:
         model = Product
-        fields = ['name', 'price', 'description', 'quantity',"seller"]
+        fields = ['name', 'price', 'description', 'quantity',"seller", "category"]
         exclude=["seller"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control'})
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+
         }
+    
