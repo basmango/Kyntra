@@ -159,6 +159,22 @@ def addProductFormView(request):
         form =AddProductForm()
 
     context={
-        'form':form
+        'form':form,
+        'editing':False
+    }
+    return render(request, "seller/add_product.html", context)
+
+def editProductFormView(request, id):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        model.save()
+        form =AddProductForm()
+
+    context={
+        'form':form,
+        'editing':True,
+        'id':id
     }
     return render(request, "seller/add_product.html", context)

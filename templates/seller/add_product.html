@@ -5,10 +5,15 @@
 
 <main>
     <div class="container card mt-3 py-3 ">
+        {% if editing %}
+        <p class="fs-4">Edit Product</p>
+        {% endif %}
+        {% if not editing %}
         <p class="fs-4">Add Product</p>
+        {% endif %}
         <hr/>
         <form method='POST'>
-            {%csrf_token%}
+            {% csrf_token %}
             {{form.as_p}}
             <div class="d-grid gap-2">
                 <input type="submit" class="btn btn-primary" value="Add New Product" />
