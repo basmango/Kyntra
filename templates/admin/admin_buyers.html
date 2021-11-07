@@ -4,96 +4,72 @@
 
 {% block content %}
 
-	<section class="p-5">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header">
-							<b>Users</b>
-						</div>
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item d-flex justify-content-between align-items-start active" aria-current="true">
-								All users
-								<span class="badge bg-light rounded-pill text-dark">4</span>
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-start">
-								Recently joined
-								<span class="badge bg-primary rounded-pill">4</span>
-							</li>
-						</ul>
+<section class="p-5">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header">
+						<b>Users</b>
 					</div>
-
-				</div>
-
-				<div class="col-md-9">
-					<div class="row">
-						<div class="col-md-12">
-
-							<ul class="list-group list-group-flush ">
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>User Name</b>
-												<br />
-												User Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>User Name</b>
-												<br />
-												User Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>User Name</b>
-												<br />
-												User Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>User Name</b>
-												<br />
-												User Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-							</ul>
-						</div>
+					<!-- <ul class="list-group list-group-flush">
+						<li class="list-group-item d-flex justify-content-between align-items-start active list-group-item-action"
+							aria-current="true">
+							All users
+							<span class="badge bg-light rounded-pill text-dark">{{buyer_count}}</span>
+						</li>
+						<li class="list-group-item d-flex justify-content-between align-items-start list-group-item-action">
+							Recently joined
+							<span class="badge bg-primary rounded-pill">{{buyer_count}}</span>
+						</li>
+					</ul> -->
+					<div class="list-group list-group-flush">
+						<a href="/kyntra/admin/buyers/"
+							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'all' %} active {% endif %}">
+							All users
+							<span class="badge rounded-pill {% if option  == 'all' %} bg-light text-dark {% else %} bg-primary {% endif %}">
+								{{buyer_count}}
+							</span>
+						</a>
 					</div>
 				</div>
 
 			</div>
+
+			<div class="col-md-9">
+				<div class="row">
+					<div class="col-md-12">
+
+						<ul class="list-group list-group-flush ">
+								{% for user in buyers %}
+								<li class="list-group-item">
+									<div class="row">
+										<div class="col-md-auto">
+											{{user.user.id}}
+										</div>
+										<div class="col">
+											<p><b>{{user.user.username}}</b>
+											</p>
+										</div>
+										<div class="col">
+											<p>{{user.user.email}}
+											</p>
+										</div>
+										<div class="col-md-auto">
+											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="" class="btn btn-danger">Remove</a>
+										</div>
+									</div>
+								</li>
+								{% endfor %}
+
+						</ul>
+					</div>
+				</div>
+			</div>
+
 		</div>
-	</section>
+	</div>
+</section>
 
 {% endblock %}
