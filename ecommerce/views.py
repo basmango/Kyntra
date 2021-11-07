@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AdminAddProductsForm, AdminRemoveProductsForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm
 
 class SearchProductListView(ListView):
 	model = Product
@@ -133,6 +133,15 @@ def admin_buyers(request, option = 'all'):
 		'buyer_count':buyer_count
 		})
 
+def admin_removebuyer(request):
+	if request.method == 'POST':
+		form = AdminRemoveBuyersForm(request.POST)
+		if form.is_valid():
+			Buyer.objects.filter(id=request.POST['id']).delete()
+
+			return HttpResponseRedirect('/kyntra/admin/buyers/')
+
+	return admin_buyers(request)
 
 def admin_sellers(request, option="all"):
 	sellers = Seller.objects.all()
@@ -227,25 +236,13 @@ def admin_addproduct(request):
 	return admin_products(request)
 
 def admin_removeproduct(request):
-		# if this is a POST request we need to process the form data
 	if request.method == 'POST':
-		# create a form instance and populate it with data from the request:
 		form = AdminRemoveProductsForm(request.POST)
-		# check whether it's valid:
 		if form.is_valid():
 			Product.objects.filter(id=request.POST['id']).delete()
-			# process the data in form.cleaned_data as required
-			# ...
-			# redirect to a new URL:
+
 			return HttpResponseRedirect('/kyntra/admin/products/')
 
-	# if a GET (or any other method) we'll create a blank form
-		#remove
-	# else:
-		#add line in admin products
-		# form = AdminAddProductsForm()
-
-	# return render(request, 'admin/name.html', {'form': form})
 	return admin_products(request)
 
 def seller_all_products(request):

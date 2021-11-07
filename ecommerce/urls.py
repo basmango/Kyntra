@@ -9,6 +9,8 @@ urlpatterns = [
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/buyers/', views.admin_buyers, name='admin_buyers'),
     path('admin/buyers/<str:option>/', views.admin_buyers, name='admin_buyers'),
+    path('admin/removebuyers/', views.admin_removebuyer, name='admin_removebuyer'),
+
 
     path('admin/sellers/', views.admin_sellers, name='admin_sellers'),
     path('admin/sellers/<str:option>/', views.admin_sellers, name='admin_sellers'),

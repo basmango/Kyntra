@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.forms import fields
 
-from ecommerce.models import ShippingAddress, Product
+from ecommerce.models import ShippingAddress, Product, Buyer, Seller
 
 class BuyerSignUpForm(UserCreationForm):
     class Meta:
@@ -42,4 +42,9 @@ class AdminAddProductsForm(forms.ModelForm):
 class AdminRemoveProductsForm(forms.ModelForm):
 	class Meta:
 		model = Product
+		fields = ()
+
+class AdminRemoveBuyersForm(forms.ModelForm):
+	class Meta:
+		model = Buyer
 		fields = ()
