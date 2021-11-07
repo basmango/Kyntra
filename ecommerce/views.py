@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db.models.deletion import PROTECT
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
@@ -8,8 +10,13 @@ from django.http import HttpResponse, request
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm, OTPForm
+import random
+import datetime
+from django.core.mail import send_mail
 
+def getRandomNumber():
+    return random.randint(100000, 999999)
 
 class SearchProductListView(ListView):
 	model = Product
@@ -59,6 +66,27 @@ def signup(request):
 	return render(request, 'registration/signup.html')
 
 
+def otp_verification(request):
+	if request.method == 'POST':
+		form = OTPForm(request.POST)
+		if form.is_valid():
+			otp = form.cleaned_data.get('otp')
+			email = form.cleaned_data.get('email')
+		user = UserProfile.objects.get(user__email=email)
+		tzinfo = datetime.timezone(datetime.timedelta(0))
+		currTime = datetime.datetime.now(tzinfo)
+		if otp == user.otp and currTime < user.otp_expiry and user.is_verified == False:
+			user.is_verified = True
+			user.save()
+			return redirect('login')
+		else:
+			user.delete()
+			return HttpResponse("Invalid OTP! User is requested to sign up again to get another OTP.")
+	else:	
+		form = OTPForm()
+	return render(request, 'registration/otp_verification.html', {'form': form})
+
+
 def buyer_signup(request):
 	if request.method == 'POST':
 		form = BuyerSignUpForm(request.POST)
@@ -67,14 +95,13 @@ def buyer_signup(request):
 			user = form.save()
 			address = address_form.save()
 			user.refresh_from_db()
-			Buyer.objects.create(user=user, address=address)
+			nextTime = datetime.datetime.now() + datetime.timedelta(minutes = 15)
+			otp = getRandomNumber()
+			Buyer.objects.create(user=user, address=address, otp = otp, otp_expiry = nextTime, is_buyer = True)
+			send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
 			user.save()
 			address.save()
-			raw_password = form.cleaned_data.get('password1')
-			# login user after signing up
-			user = authenticate(username=user.username, password=raw_password)
-			login(request, user)            
-			return redirect('index')
+			return redirect('otp_verification')
 	else:
 		form = BuyerSignUpForm()
 		address_form = AddressForm()
@@ -87,19 +114,35 @@ def seller_signup(request):
 		if form.is_valid():
 			user = form.save()
 			user.refresh_from_db()
-			Seller.objects.create(user=user, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'))
 			user.save()
-			raw_password = form.cleaned_data.get('password1')
-			# login user after signing up
-			user = authenticate(username=user.username, password=raw_password)
-			login(request, user)
-			# TODO Change to seller registration for document upload etc.
-			return redirect('index')
+			nextTime = datetime.datetime.now() + datetime.timedelta(minutes = 15)
+			otp = getRandomNumber()
+			Seller.objects.create(user=user, otp = otp, otp_expiry = nextTime, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True)
+			send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+			return redirect('otp_verification')
 	else:
 		form = SellerSignUpForm()
 
 	return render(request,'registration/seller_signup.html', {'form': form})
 
+
+
+def redirect_user(request):
+	if request.user.is_authenticated:
+		user_profile = UserProfile.objects.get(user=request.user)
+		if user_profile.is_verified:
+			if user_profile.is_seller:
+				return redirect('seller_all_products')
+			elif user_profile.is_buyer:
+				return redirect('index')
+			elif user_profile.is_admin:
+				return redirect('admin_dashboard')
+			else:
+				return Http404()
+		else:
+			return redirect('otp_verification')
+	else:
+		return redirect('login')
 
 
 def index(request):
