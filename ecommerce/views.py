@@ -1,5 +1,5 @@
 from django.db.models.deletion import PROTECT
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
@@ -157,6 +157,7 @@ def addProductFormView(request):
         
         model.save()
         form =AddProductForm()
+        return redirect('seller_all_products')
 
     context={
         'form':form,
@@ -165,12 +166,14 @@ def addProductFormView(request):
     return render(request, "seller/add_product.html", context)
 
 def editProductFormView(request, id):
-    form =AddProductForm(request.POST or None)
+    instance=get_object_or_404(Product, id=id)
+    form =AddProductForm(request.POST or None, instance=instance)
     if(form.is_valid()):
         model =form.save(commit=False)
         model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
         model.save()
         form =AddProductForm()
+        return redirect('seller_all_products')
 
     context={
         'form':form,
@@ -178,3 +181,7 @@ def editProductFormView(request, id):
         'id':id
     }
     return render(request, "seller/add_product.html", context)
+
+def logoutView(request):
+    logout(request)
+    return HttpResponse("Logout Successful")

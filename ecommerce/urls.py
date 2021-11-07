@@ -13,5 +13,6 @@ urlpatterns = [
     path('seller/add_product/', views.addProductFormView, name='add_product'),
     path('seller/edit_product/<int:id>/', views.editProductFormView, name='edit_product'),
     path('seller/registration/', views.seller_registration, name='seller_registration'),
-    path('search/',views.SearchProductListView.as_view(),name="search_results")
+    path('search/',views.SearchProductListView.as_view(),name="search_results"),
+    path('logout/',views.logoutView, name ='logout')
 ]  
