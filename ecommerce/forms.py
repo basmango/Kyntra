@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import fields
 from django.forms import widgets
+from django.http import request
 
 from ecommerce.models import Product, ShippingAddress
 
@@ -33,10 +34,13 @@ class AddressForm(forms.ModelForm):
 
 
 class AddProductForm(forms.ModelForm):
-    
+    def __init__(self, *args, **kwargs):
+        super(AddProductForm, self).__init__(*args, **kwargs)
+        
     class Meta:
         model = Product
-        fields = ['name', 'price', 'description', 'quantity']
+        fields = ['name', 'price', 'description', 'quantity',"seller"]
+        exclude=["seller"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control'}),

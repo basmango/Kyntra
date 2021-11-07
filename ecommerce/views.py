@@ -1,7 +1,7 @@
 from django.db.models.deletion import PROTECT
 from django.shortcuts import redirect, render
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, request
@@ -152,11 +152,13 @@ class SellerSearchView(ListView):
 def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):
-        form.save()
+        # form["seller"]= request.user.id
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        model.save()
         form =AddProductForm()
 
     context={
         'form':form
     }
     return render(request, "seller/add_product.html", context)
-    
