@@ -38,3 +38,8 @@ class AdminAddProductsForm(forms.ModelForm):
             'quantity': forms.TextInput(attrs={'class': 'form-control',}),
             'rating': forms.TextInput(attrs={'class': 'form-control',}),
         }
+
+class AdminRemoveProductsForm(forms.ModelForm):
+	class Meta:
+		model = Product
+		fields = ()
