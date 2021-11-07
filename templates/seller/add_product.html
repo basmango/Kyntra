@@ -21,7 +21,7 @@
                 {% endif %}
                 {% if editing %}
                 <input type="submit" class="btn btn-primary" value="Save Product" />
-                <input type="submit" class="btn btn-danger" value="Delete Product" />
+                <a href="{% url 'delete_product' id=item.id %}" class="btn btn-primary">Delete Product</a>
                 {% endif %}
             </div>
 

@@ -182,6 +182,13 @@ def editProductFormView(request, id):
     }
     return render(request, "seller/add_product.html", context)
 
+def deleteProductFormView(request , id):
+    product=Product.objects().get(id=id)
+    if(request.method=="POST"):
+        product.delete()
+        return redirect('seller_all_products')
+    return redirect("seller_all_products")
+
 def logoutView(request):
     logout(request)
     return HttpResponse("Logout Successful")
