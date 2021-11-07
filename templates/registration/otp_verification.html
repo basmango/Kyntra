@@ -2,8 +2,42 @@
 {% load widget_tweaks %}
 
 {% block title %}Sign Up | Kyntra{% endblock %}
-
+{% load static %}
 {% block content %}
+<script src="{% static 'js/vatmpad.js' %}"></script>
+
+<script>
+    var keyboard_generated = false;
+
+    function keyb_callback(char) {
+        var text =
+            document.getElementById("id_otp"),
+            val = text.value;
+
+        switch (char) {
+            case "BackSpace":
+                var min = (val.charCodeAt(val.length - 1) == 10) ? 2 : 1;
+                text.value = val.substr(0, val.length - min);
+                break;
+
+            case "Enter":
+                text.value += "\n";
+                break;
+
+            default:
+                text.value = text.value * 10 + Number(char);
+        }
+    }
+
+    function keyb_init() {
+        if (keyboard_generated) {
+            return;
+        } else {
+            keyboard_generated = true;
+            new VATMpad('keyboard', keyb_callback);
+        }
+    }
+</script>
 <section class="gradient-custom">
     <div class="container py-5 h-75">
         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -40,7 +74,9 @@
                                 <input class="btn btn-outline-light btn-lg px-5 mt-5 pt-lg-2" type="submit"
                                     value="Enter" />
                             </form>
-
+                            <div id="keyboard" style="color: black;"></div>
+                            <button class="btn btn-outline-light btn-lg px-5 mt-1" onclick="keyb_init()">Use virtual
+                                keyboard</button>
                         </div>
                     </div>
                 </div>
