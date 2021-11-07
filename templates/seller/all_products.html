@@ -5,7 +5,7 @@
 
 <main>
     <div class="container dark-grey-text">
-        
+
         <div class="input-group my-3">
             <input type="text" class="form-control" placeholder="Search for Item" aria-label="Search for Item"
                 aria-describedby="button-addon2">
@@ -19,17 +19,19 @@
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card text-center">
-                    <img draggable="false"
+                    <img draggable="false" style="height:300px; width:auto;object-fit: cover"
                         src="https://1.bp.blogspot.com/-hQIA_pkA7rk/X66x8_qa5PI/AAAAAAAACcE/Bg1TTmpv3asna2o0wB2yeU2RsJ7i-g-twCLcBGAsYHQ/w1200-h630-p-k-no-nu/diwali-soan-papdi-recipe-in-hindi-diwali-sweet.JPG"
                         class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
-                            <span class="badge bg-danger mx-1">{{item.supertag}}</span>
+                            {% if item.quantity == 0 %}
+                            <span class="badge bg-danger mx-1">SOLD OUT</span>
+                            {% endif %}
                         </h5>
                         <p class="card-text">{{item.description}}</p>
-                        <a href="" class="btn btn-primary">Check Sales</a>
+                        <a href="" class="btn btn-primary">Edit Product</a>
                         <br />
-                        <a href="" id="edit-product-button" class="card-link">Edit</a>
+
                     </div>
 
                 </div>
