@@ -17,6 +17,12 @@ class ShippingAddress(models.Model):
 class UserProfile(models.Model):
 	user = models.OneToOneField(
 		settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	otp = models.PositiveSmallIntegerField(default=0)
+	otp_expiry = models.DateTimeField(null=True, blank=True)
+	is_verified = models.BooleanField(default=False)
+	is_buyer = models.BooleanField(default=False)
+	is_seller = models.BooleanField(default=False)
+	is_admin = models.BooleanField(default=False)
 	# phone = models.CharField(max_length=20, blank=True, null=True)
 	photo_url = models.ImageField(
 		upload_to="media", blank=True, null=True)

@@ -7,14 +7,23 @@ from django.db.models import fields
 from django.forms import widgets
 from django.http import request
 
-from ecommerce.models import Product, ShippingAddress
+from ecommerce.models import Product, ShippingAddress, UserProfile
 
 
 class BuyerSignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
 
+        if User.objects.filter(email=email).exists():
+            msg = 'A user with that email already exists.'
+            self.add_error('email', msg)           
+    
+        return self.cleaned_data
 
 class SellerSignUpForm(UserCreationForm):
     company_name = forms.CharField(max_length=256, required=True)
@@ -25,7 +34,15 @@ class SellerSignUpForm(UserCreationForm):
         labels = {"company_name": "Company Name", "gst_number": "GST Number"}
         fields = ('username', 'email', 'password1',
                   'password2', 'company_name', 'gst_number')
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
 
+        if User.objects.filter(email=email).exists():
+            msg = 'A user with that email already exists.'
+            self.add_error('email', msg)           
+    
+        return self.cleaned_data
 
 class AddressForm(forms.ModelForm):
     class Meta:
@@ -48,3 +65,13 @@ class AddProductForm(forms.ModelForm):
 
         }
     
+
+class OTPForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+    class Meta:
+        model = UserProfile
+        fields = ['otp', 'email']
+        widgets = {
+            'otp': forms.NumberInput(),
+            'email': forms.EmailInput()
+        }

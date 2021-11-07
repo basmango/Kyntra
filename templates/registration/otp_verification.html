@@ -1,0 +1,51 @@
+{% extends 'registration/registration_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Sign Up | Kyntra{% endblock %}
+
+{% block content %}
+<section class="gradient-custom">
+    <div class="container py-5 h-75">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white" style="border-radius: 1rem">
+                    <div class="card-body p-5 text-center">
+                        <div class="mb-md-3 mt-md-2 pb-2">
+                            <h2 class="fw-bold mb-2 text-uppercase">Verify Email</h2>
+                            <form method="post" action="{% url 'otp_verification' %}">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                <div class="form-floating form-white mb-1 text-black py-2">
+                                    <div class="text-start text-white">
+                                        {{ field.label_tag }}
+                                    </div>
+                                    <div class="pt-2 text-start d-flex">
+                                        {{field|add_class:'form-control'}}
+                                        {% if field.help_text %}
+                                        <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            data-bs-html="true" title="{{field.help_text}}">
+                                            <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto"
+                                                style="color: white;"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+
+                                    {% for error in field.errors %}
+                                    <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endfor %}
+
+
+                                <input class="btn btn-outline-light btn-lg px-5 mt-5 pt-lg-2" type="submit"
+                                    value="Enter" />
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
