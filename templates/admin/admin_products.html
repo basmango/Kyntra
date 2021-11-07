@@ -4,99 +4,106 @@
 
 {% block content %}
 
-	<section class="p-5">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-3">
-					<div class="card">
-						<div class="card-header">
-							<b>Products</b>
-						</div>
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item active" aria-current="true">	All products</li>
-							<li class="list-group-item ">Fashion</li>
-							<li class="list-group-item ">Electronics</li>
-							<li class="list-group-item ">Home</li>
-							<li class="list-group-item ">Appliances</li>
-							<li class="list-group-item ">Cosmetics</li>
+<section class="p-5">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-header">
+						<b>Products</b>
+					</div>
+
+					<div class="list-group list-group-flush">
+						<a href="/kyntra/admin/products/"
+							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'all' %} active {% endif %}">
+							All Products
+							<span
+								class="badge rounded-pill {% if option  == 'all' %} bg-light text-dark {% else %} bg-primary {% endif %}">
+								{{product_count.0}}
+							</span>
+						</a>
+						{% load index %}
+						{% for category in categories %}
+						<a href="/kyntra/admin/products/{{category.name}}"
+							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == category.name %} active {% endif %}">
+							{{category.name}}
+							<span
+								class="badge rounded-pill {% if option  == category.name %} bg-light text-dark {% else %} bg-primary {% endif %}">
+								{{product_count|index:forloop.counter}}
+
+							</span>
+						</a>
+						{% endfor %}
+					</div>
+				</div>
+
+				<br>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProducts">+ Add products</button>
+
+			</div>
+
+			<div class="col-md-9">
+				<div class="row">
+					<div class="col-md-12">
+
+						<ul class="list-group list-group-flush ">
+							{% for product in products %}
+							<li class="list-group-item">
+								<div class="row">
+									<div class="col-md-auto">
+										{{product.id}}
+									</div>
+									<div class="col-md-3">
+										<p><b>{{product.name}}</b>
+											<br />
+											{{product.seller.user.username}}
+										</p>
+									</div>
+									<div class="col">
+										₹ {{product.price}}
+									</div>
+									<div class="col">
+										x {{product.quantity}}
+									</div>
+									<div class="col-md-auto">
+										<a href="" class="btn btn-outline-primary">View details</a>
+										<a href="" class="btn btn-danger">Remove</a>
+									</div>
+								</div>
+							</li>
+							{% endfor %}
 
 						</ul>
 					</div>
-
-					<br>
-					<button type="button" class="btn btn-primary">+ Add products</button>
-
 				</div>
-
-				<div class="col-md-9">
-					<div class="row">
-						<div class="col-md-12">
-
-							<ul class="list-group list-group-flush ">
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-								<li class="list-group-item">
-									<div class="row no-gutters">
-										<div class="col">
-											<p><b>Product Name</b>
-												<br />
-												Product Id: 12345678
-											</p>
-										</div>
-										<div class="col-md-auto">
-											<a href="" class="btn btn-outline-primary">View details</a>
-											<a href="" class="btn btn-danger">Remove</a>
-										</div>
-									</div>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
 			</div>
+
 		</div>
-	</section>
+	</div>
+</section>
+
+<div class="modal fade" id="addProducts" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Add product</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post">
+				{% csrf_token %}
+				<div class="modal-body">
+				<label for="product_name" class="form-label">Product name: </label>
+				<input id="product_name" class="form-control" type="text" name="product_name">
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">Save product</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 
 
-	{% endblock %}
+{% endblock %}
