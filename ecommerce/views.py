@@ -1,13 +1,14 @@
-from django.shortcuts import redirect, render
+from django.db.models.deletion import PROTECT
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse
+from django.http import HttpResponse, request
 from django.views.generic.list import ListView
-from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product, Category
+from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm
 
 
 class SearchProductListView(ListView):
@@ -202,53 +203,76 @@ def admin_products(request, option="all"):
 		})
 
 
-def seller_all_products(request):
-	products = [
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-   
-	]
-	return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
+
+    # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
 def seller_registration(request):
-	return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+    return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+
+class SellerAllView(ListView):
+    model=Product
+    template_name='seller/all_products.html'
+    def get_queryset(self): # new
+        return  Product.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "All Products"
+        return context
+
+class SellerSearchView(ListView):
+    model =Product
+    template_name='seller/all_products.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        return Product.objects.filter(name__icontains=query)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = "query"
+        return context
+
+def addProductFormView(request):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        
+        model.save()
+        form =AddProductForm()
+        return redirect('seller_all_products')
+
+    context={
+        'form':form,
+        'editing':False
+    }
+    return render(request, "seller/add_product.html", context)
+
+def editProductFormView(request, id):
+    instance=get_object_or_404(Product, id=id)
+    form =AddProductForm(request.POST or None, instance=instance)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        model.save()
+        form =AddProductForm()
+        return redirect('seller_all_products')
+
+    context={
+        'form':form,
+        'editing':True,
+        'id':id
+    }
+    return render(request, "seller/add_product.html", context)
+
+def deleteProductFormView(request , id):
+    product=Product.objects().get(id=id)
+    if(request.method=="POST"):
+        product.delete()
+        return redirect('seller_all_products')
+    return redirect("seller_all_products")
+
+def logoutView(request):
+    logout(request)
+    return HttpResponse("Logout Successful")
+
+

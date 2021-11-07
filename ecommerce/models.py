@@ -31,6 +31,7 @@ class Buyer(UserProfile):
 		return "Buyer " + self.user.username
 
 class Seller(UserProfile):
+
 	company_name = models.CharField(max_length=100, blank=True, null=True)
 	gst_number = models.CharField(max_length=15, blank=True, null=True)
 	applied = models.BooleanField(default=False)
@@ -38,6 +39,7 @@ class Seller(UserProfile):
 
 	def __str__(self):
 		return "Seller " + self.user.username
+
 
 
 class Category(models.Model):
