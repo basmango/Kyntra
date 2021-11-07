@@ -3,12 +3,35 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AdminAddProductsForm
 
+def admin_addproduct(request):
+	# if this is a POST request we need to process the form data
+	if request.method == 'POST':
+		# create a form instance and populate it with data from the request:
+		form = AdminAddProductsForm(request.POST)
+		# check whether it's valid:
+		if form.is_valid():
+			product = form.save()
+			product.refresh_from_db()
+			product.save()
+			# process the data in form.cleaned_data as required
+			# ...
+			# redirect to a new URL:
+			return HttpResponseRedirect('/kyntra/admin/products/')
+
+	# if a GET (or any other method) we'll create a blank form
+		#remove
+	# else:
+		#add line in admin products
+		# form = AdminAddProductsForm()
+
+	# return render(request, 'admin/name.html', {'form': form})
+	return admin_products(request)
 
 class SearchProductListView(ListView):
 	model = Product
@@ -191,6 +214,7 @@ def admin_products(request, option="all"):
 	for p in products:
 		product_count.append(len(p))
 
+	form = AdminAddProductsForm()
 
 	
 	return render(request, 'admin/admin_products.html', {
@@ -199,6 +223,7 @@ def admin_products(request, option="all"):
 		'products':products[curr], 
 		'product_count':product_count,
 		'categories':categories,
+		'form':form,
 		})
 
 

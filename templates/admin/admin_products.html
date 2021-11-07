@@ -81,6 +81,7 @@
 		</div>
 	</div>
 </section>
+{% load widget_tweaks %}
 
 <div class="modal fade" id="addProducts" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
@@ -89,12 +90,10 @@
 				<h5 class="modal-title" id="exampleModalLabel">Add product</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-			<form action="" method="post">
+			<form action="/kyntra/yourname/" method="post">
 				{% csrf_token %}
 				<div class="modal-body">
-				<label for="product_name" class="form-label">Product name: </label>
-				<input id="product_name" class="form-control" type="text" name="product_name">
-
+					{{ form }}
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
