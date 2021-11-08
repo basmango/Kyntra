@@ -32,9 +32,10 @@ class UserProfile(models.Model):
 
 
 class Buyer(UserProfile):
-	address = models.OneToOneField(ShippingAddress, on_delete=models.CASCADE)
-	def __str__(self):
-		return "Buyer " + self.user.username
+    address = models.OneToOneField(ShippingAddress, on_delete=models.CASCADE)
+    activated = models.BooleanField(default=False)
+    def __str__(self):
+        return "Buyer " + self.user.username
 
 class Seller(UserProfile):
 

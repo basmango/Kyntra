@@ -28,5 +28,7 @@ urlpatterns = [
     # path('seller/delete_product/<int:id>/', views.deleteProductFormView, name='delete_product'),
     path('seller/registration/', views.seller_registration, name='seller_registration'),
     path('search/',views.SearchProductListView.as_view(),name="search_results"),
+    path('product/<pk>/', views.ProductDetailView.as_view(), name='product'),
+    path('purchase/',views.Purchase,name="purchase_endpoint"),
     path('logout/',views.logoutView, name ='logout')
 ]  
