@@ -5,23 +5,17 @@
 
 <main>
     <div class="container dark-grey-text">
-
-        <div class="input-group my-3">
-            <input type="text" id="search"  class="form-control" placeholder="Search for Item"
-                aria-label="Search for Item" aria-describedby="search-button">
-            <button class="btn btn-primary" type="button" id="search-button" onclick="alertHelloworld()">Search</button>
-        </div>
+        
 
 
         <!--Grid row-->
-        <div class="row wow fadeIn">
+        <div class="row wow fadeIn mt-3">
             {% for item in object_list%}
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card text-center">
                     <img draggable="false" style="height:300px; width:auto;object-fit: cover"
-                        src="https://1.bp.blogspot.com/-hQIA_pkA7rk/X66x8_qa5PI/AAAAAAAACcE/Bg1TTmpv3asna2o0wB2yeU2RsJ7i-g-twCLcBGAsYHQ/w1200-h630-p-k-no-nu/diwali-soan-papdi-recipe-in-hindi-diwali-sweet.JPG"
-                        class="card-img-top " alt="...">
+                        src="{{item.productimage_set.all.0.image.url }}" class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
                             {% if item.quantity == 0 %}
