@@ -45,7 +45,7 @@ class Seller(UserProfile):
     gst_number = models.CharField(max_length=15, blank=True, null=True)
     applied = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
-
+    document=models.FileField()
     def __str__(self):
         return "Seller " + self.user.username
 

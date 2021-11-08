@@ -305,7 +305,7 @@ def buyer_signup(request):
 
 def seller_signup(request):
     if request.method == 'POST':
-        form = SellerSignUpForm(request.POST)
+        form = SellerSignUpForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             user.refresh_from_db()
@@ -313,7 +313,7 @@ def seller_signup(request):
             nextTime = datetime.datetime.now() + datetime.timedelta(minutes=15)
             otp = getRandomNumber()
             Seller.objects.create(user=user, otp=otp, otp_expiry=nextTime, company_name=form.cleaned_data.get(
-                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True)
+                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'])
             send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             return redirect('otp_verification')
@@ -321,7 +321,6 @@ def seller_signup(request):
         form = SellerSignUpForm()
 
     return render(request, 'registration/seller_signup.html', {'form': form})
-
 
 def redirect_user(request):
     if request.user.is_authenticated:

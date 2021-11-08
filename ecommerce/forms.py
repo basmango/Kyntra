@@ -31,12 +31,12 @@ class BuyerSignUpForm(UserCreationForm):
 class SellerSignUpForm(UserCreationForm):
     company_name = forms.CharField(max_length=256, required=True)
     gst_number = forms.CharField(max_length=15, required=True)
-
+    document=forms.FileField(required=True)
     class Meta:
         model = User
         labels = {"company_name": "Company Name", "gst_number": "GST Number"}
         fields = ('username', 'email', 'password1',
-                  'password2', 'company_name', 'gst_number')
+                  'password2', 'company_name', 'gst_number','document')
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
