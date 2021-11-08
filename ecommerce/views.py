@@ -237,8 +237,7 @@ def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):
         model =form.save(commit=False)
-        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
-        
+        model.seller=Seller.objects.get(Q(id=request.user.id))
         model.save()
         form =AddProductForm()
         return redirect('seller_all_products')
