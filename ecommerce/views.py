@@ -6,13 +6,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse, request
+from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm, OTPForm
-import stripe
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm, OTPForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm, AdminSellerActionsForm
 import random
+import stripe
 import datetime
 from django.core.mail import send_mail
 
@@ -149,103 +149,191 @@ def redirect_user(request):
 def index(request):
 	return render(request, 'general/home.html')
 
+def admin_check(request):
+	if request.user.is_authenticated:
+		if UserProfile.objects.filter(user=request.user):
+			user_profile = UserProfile.objects.get(user=request.user)
+			if user_profile.is_admin:
+					return True
+			else:
+					return False
+	else:
+		return False
 
 def admin_dashboard(request):
-	buyers = Buyer.objects.all()
-	sellers = Seller.objects.all()
-	pending = sellers.filter(applied = True, application_status = False )
-	products = Product.objects.all()
-	b = len(buyers)
-	s = len(sellers)
-	pen = len(pending)
-	p = len(products)
+	if admin_check(request) :
+		buyers = Buyer.objects.all()
+		sellers = Seller.objects.all()
+		pending = sellers.filter(applied = True, approved = False )
+		products = Product.objects.all()
+		b = len(buyers)
+		s = len(sellers)
+		pen = len(pending)
+		p = len(products)
 
-	return render(request, 'admin/admin_dashboard.html', {
-		'name': 'admin_dashboard',
-		'buyer_count':b,
-		'seller_count':s,
-		'pending_count':pen,
-		'product_count':p})
+		return render(request, 'admin/admin_dashboard.html', {
+			'name': 'admin_dashboard',
+			'buyer_count':b,
+			'seller_count':s,
+			'pending_count':pen,
+			'product_count':p})
+	else:
+		return HttpResponseNotFound()
 
 
 def admin_buyers(request, option = 'all'):
-	buyers = Buyer.objects.all()
-	buyer_count = len(buyers)
-	# buyer_count = option
-	return render(request, 'admin/admin_buyers.html', {
-		'name': 'admin_buyers', 
-		'option':option, 
-		'buyers': buyers, 
-		'buyer_count':buyer_count
-		})
+	if admin_check(request) :
+		buyers = Buyer.objects.all()
+		buyer_count = len(buyers)
+		# buyer_count = option
+		return render(request, 'admin/admin_buyers.html', {
+			'name': 'admin_buyers', 
+			'option':option, 
+			'buyers': buyers, 
+			'buyer_count':buyer_count
+			})
+	else:
+		return HttpResponseNotFound()
 
+def admin_removebuyer(request):
+	if admin_check(request) :
+		if request.method == 'POST':
+			form = AdminRemoveBuyersForm(request.POST)
+			if form.is_valid():
+				Buyer.objects.filter(id=form.cleaned_data['id']).delete()
+
+				return HttpResponseRedirect('/kyntra/admin/buyers/')
+
+		return admin_buyers(request)
+	else:
+		return HttpResponseNotFound()
 
 def admin_sellers(request, option="all"):
-	sellers = Seller.objects.all()
-	pending = sellers.filter(applied = True, application_status = False )
-	approved = sellers.filter(applied = True, application_status = True )
-	unapproved = sellers.filter(applied = False )
+	if admin_check(request) :
+		sellers = Seller.objects.all()
+		pending = sellers.filter(applied = True, approved = False )
+		approved = sellers.filter(applied = True, approved = True )
+		unapproved = sellers.filter(applied = False )
 
-	# seller_count = len(sellers)
-	seller_count = len(sellers)
-	pending_count = len(pending)
-	approved_count = len(approved)
-	unapproved_count = len(unapproved)
+		# seller_count = len(sellers)
+		seller_count = len(sellers)
+		pending_count = len(pending)
+		approved_count = len(approved)
+		unapproved_count = len(unapproved)
 
-	sellerlist = []
-	if option == 'pending':
-		sellerlist = pending
-	elif option == 'approved':
-		sellerlist = approved
-	elif option == 'unapproved':
-		sellerlist = unapproved
+		sellerlist = []
+		if option == 'pending':
+			sellerlist = pending
+		elif option == 'approved':
+			sellerlist = approved
+		elif option == 'unapproved':
+			sellerlist = unapproved
+		else:
+			sellerlist = sellers
+
+		return render(request, 'admin/admin_sellers.html', {
+			'name': 'admin_sellers', 
+			'option':option, 
+			'sellers':sellerlist, 
+			'seller_count':seller_count,
+			'pending_count':pending_count,
+			'approved_count':approved_count,
+			'unapproved_count':unapproved_count,
+			})
 	else:
-		sellerlist = sellers
+		return HttpResponseNotFound()
 
-	return render(request, 'admin/admin_sellers.html', {
-		'name': 'admin_sellers', 
-		'option':option, 
-		'sellers':sellerlist, 
-		'seller_count':seller_count,
-		'pending_count':pending_count,
-		'approved_count':approved_count,
-		'unapproved_count':unapproved_count,
-		})
+def admin_selleractions(request):
+	if admin_check(request) :
+		if request.method == 'POST':
+			form = AdminSellerActionsForm(request.POST)
+			if form.is_valid():
+				if('approveButton' in request.POST):
+					Seller.objects.filter(id=form.cleaned_data['id']).update(approved=True)
+				if('rejectButton' in request.POST):
+					Seller.objects.filter(id=form.cleaned_data['id']).update(approved=False, applied=False)
+				if('deleteButton' in request.POST):
+					Seller.objects.filter(id=form.cleaned_data['id']).delete()
+				return HttpResponseRedirect('/kyntra/admin/sellers/')
 
-# def admin_sellerapplication	(request):
-# 	if request.method == "POST":
-# 		request.
-# 	# return admin_sellers(request, )
+		return admin_sellers(request)
+	else:
+		return HttpResponseNotFound()
 
 
 def admin_products(request, option="all"):
-	products = []
-	product_count = []
-	curr = 0
+	if admin_check(request) :
+		products = []
+		product_count = []
+		curr = 0
 
-	products.append(Product.objects.all())
-	categories = Category.objects.all()
+		products.append(Product.objects.all())
+		categories = Category.objects.all()
 
-	i=0
-	for c in categories:
-		i+=1
-		products.append(Product.objects.filter(category=Category.objects.filter(name=c.name).get()))
-		if c.name == option:
-			curr = i
-	# product_count = len(sellers)
-	for p in products:
-		product_count.append(len(p))
+		i=0
+		for c in categories:
+			i+=1
+			products.append(Product.objects.filter(category=Category.objects.filter(name=c.name).get()))
+			if c.name == option:
+				curr = i
+		# product_count = len(sellers)
+		for p in products:
+			product_count.append(len(p))
 
+		form = AdminAddProductsForm()
 
-	
-	return render(request, 'admin/admin_products.html', {
-		'name': 'admin_products',
-		'option':option, 
-		'products':products[curr], 
-		'product_count':product_count,
-		'categories':categories,
-		})
+		
+		return render(request, 'admin/admin_products.html', {
+			'name': 'admin_products',
+			'option':option, 
+			'products':products[curr], 
+			'product_count':product_count,
+			'categories':categories,
+			'form':form,
+			})
+	else:
+		return HttpResponseNotFound()
 
+def admin_addproduct(request):
+	if admin_check(request) :
+		# if this is a POST request we need to process the form data
+		if request.method == 'POST':
+			# create a form instance and populate it with data from the request:
+			form = AdminAddProductsForm(request.POST)
+			# check whether it's valid:
+			if form.is_valid():
+				product = form.save()
+				product.refresh_from_db()
+				product.save()
+				# process the data in form.cleaned_data as required
+				# ...
+				# redirect to a new URL:
+				return HttpResponseRedirect('/kyntra/admin/products/')
+
+		# if a GET (or any other method) we'll create a blank form
+			#remove
+		# else:
+			#add line in admin products
+			# form = AdminAddProductsForm()
+
+		# return render(request, 'admin/name.html', {'form': form})
+		return admin_products(request)
+	else:
+		return HttpResponseNotFound()
+
+def admin_removeproduct(request):
+	if admin_check(request) :
+
+		if request.method == 'POST':
+			form = AdminRemoveProductsForm(request.POST)
+			if form.is_valid():
+				Product.objects.filter(id=form.cleaned_data['id']).delete()
+
+				return HttpResponseRedirect('/kyntra/admin/products/')
+
+		return admin_products(request)
+	else:
+		return HttpResponseNotFound()	
 
 
     # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  

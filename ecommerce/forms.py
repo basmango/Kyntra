@@ -3,12 +3,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.forms import fields
 from django.db.models import fields
 from django.forms import widgets
 from django.http import request
 
-from ecommerce.models import Product, ShippingAddress, UserProfile
-
+from ecommerce.models import UserProfile, ShippingAddress, Product, Buyer, Seller
 
 class BuyerSignUpForm(UserCreationForm):
     class Meta:
@@ -49,6 +49,31 @@ class AddressForm(forms.ModelForm):
         model = ShippingAddress
         fields = ('address1', 'address2', 'city', 'country', 'zipcode')
 
+class AdminAddProductsForm(forms.ModelForm):
+	class Meta:
+		model = Product
+		fields = '__all__'
+		widgets = {
+            'seller': forms.Select(attrs={'class': 'form-select',}),
+            'category': forms.Select(attrs={'class': 'form-select',}),
+            'name': forms.TextInput(attrs={'class': 'form-control',}),
+            'price': forms.NumberInput(attrs={'class': 'form-control',}),
+            'description': forms.Textarea(attrs={'class': 'form-control','rows':"3"}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control',}),
+            'rating': forms.NumberInput(attrs={'class': 'form-control',}),
+        }
+
+class AdminRemoveProductsForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
+	class Meta:
+		model = Product
+		fields = ()
+
+class AdminRemoveBuyersForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
+	class Meta:
+		model = Buyer
+		fields = ()
 
 class AddProductForm(forms.ModelForm):
     # submit_images = forms.ImageField(widget=forms.FileInput(attrs={'multiple':True}), required=True)
@@ -64,6 +89,12 @@ class AddProductForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'}),
 
         }
+
+class AdminSellerActionsForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
+	class Meta:
+		model = Seller
+		fields = ()
     
 
 class OTPForm(forms.ModelForm):
