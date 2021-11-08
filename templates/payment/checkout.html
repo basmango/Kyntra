@@ -1,14 +1,37 @@
-<html>
+{% extends "general/general_base.html" %}
+{% block title %} Checkout {% endblock %}
+{% block general_content %}
+{% load static %}
+<script src="https://js.stripe.com/v3/"></script>
 
-<head>
-    {% load static %}
-    <title>Checkout</title>
-    <script src="https://js.stripe.com/v3/"></script>
-    {% comment %} <script src="./checkout.js"></script> {% endcomment %}
-</head>
+<div class="bg-light h-100">
+    <style>
+        body {
+            background-color: rgb(248, 249, 250);
+        }
+    </style>
 
-<body>
-    CHECKING OUT
+    <div class="row justify-content-around p-3">
+        <h1> Order Details </h1>
+
+        <div class="col-12 mb-4 bg-light " style=" text-align:left;">
+            <h3 class="m-2">{{object.name}}
+            </h3>
+            <hr />
+            <h5 class="m-2"> Price : ₹ {{ object.price }}
+            </h5>
+            <h5 class="m-2"> Quantity: {{ object.quantity }}
+            </h5>
+        </div>
+        <br />
+        <p> Total Price: {{ object.amount }}</p>
+    </div>
+
+</div>
+
+
+<div class="container">
+
     <form id="payment-form" data-clientSecret="{{client_secret}}" data-pubKey="{{public_key}}">
         <div id="payment-element">
             <!-- Elements will create form elements here -->
@@ -18,8 +41,6 @@
             <!-- Display error message to your customers here -->
         </div>
     </form>
-
-    <script src="{% static 'js/checkout.js' %}"></script>
-</body>
-
-</html>
+</div>
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

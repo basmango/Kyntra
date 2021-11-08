@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
 from django.views.generic.list import ListView
-from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
+from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
 from django.views.generic.detail import DetailView
@@ -167,18 +167,114 @@ def otp_verification(request):
 
 
 def Purchase(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
     product_id = request.POST.get('product_id')
     quantity = request.POST.get('item_count')
     quantity = int_or_0(quantity)
 
     q_set = Product.objects.all().filter(id=product_id)
 
-    if(len(q_set) != 1):
+    if len(q_set) != 1:
         return HttpResponse(status=404)
-    if(q_set[0].quantity < quantity or quantity == 0):
+    if q_set[0].quantity < quantity or quantity == 0:
         return HttpResponse(status=404)
 
-    return render(request, 'registration/signup.html')
+    # create payment intent and send to checkout page
+    product = q_set[0]
+    # multiply by 100 to get in paise
+    amount = (int)(product.price * quantity * 100)
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    intent = stripe.PaymentIntent.create(
+        amount=amount,
+        currency='inr',
+        payment_method_types=['card'],
+        receipt_email=request.user.email,
+        description=product.name
+    )
+    # create order based on payment intent
+    buyer = Buyer.objects.get(user=request.user)
+    order = Order.objects.create(
+        user=buyer,
+        product=product,
+        quantity=quantity,
+        amount=amount,
+        stripe_payment_intent=intent.id,
+        stripe_client_secret=intent.client_secret,
+        payment_completed=False,
+        payment_failed=False,
+        order_date=datetime.datetime.now(datetime.timezone.utc),
+    )
+    order.save()
+    product.quantity -= quantity
+    product.save()
+
+    return render(request, 'payment/checkout.html',
+                  {
+                      'client_secret': intent.client_secret,
+                      'public_key': settings.STRIPE_PUBLIC_KEY,
+                      'object': {
+                          'name': product.name,
+                          'price': product.price,
+                          'quantity': quantity,
+                          'amount': amount/100,
+                      }
+                  }
+                  )
+
+
+def payment_complete(request):
+    if not request.user.is_authenticated:
+        return HttpResponse("You are not logged in!", status=401)
+
+    buyer = Buyer.objects.get(user=request.user)
+    if request.method == 'GET':
+        # get users order
+        orders = Order.objects.filter(user=buyer).order_by('-order_date')
+        if orders == []:
+            return HttpResponse("You have no pending orders!", status=404)
+        # confirm payment
+        first = True
+        curr_order_status = ""
+        for order in orders:
+            if order.payment_completed or order.payment_failed:
+                continue
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            obj = stripe.PaymentIntent.retrieve(order.stripe_payment_intent)
+            if first == True:
+                first = False
+                curr_order_status = obj.status
+
+            if obj.status == 'succeeded':
+                order.payment_completed = True
+                order.payment_failed = False
+                order.save()
+            elif obj.status == "processing":
+                pass
+            elif obj.status == "requires_payment_method":
+                order.payment_failed = True
+                order.save()
+                product = order.product
+                product.quantity += order.quantity
+                product.save()
+            else:
+                order.payment_failed = True
+                order.save()
+                product = order.product
+                product.quantity += order.quantity
+                product.save()
+
+        if curr_order_status == 'succeeded':
+            return render(request, 'payment/payment_success.html')
+        elif curr_order_status == "processing":
+            return render(request, 'payment/payment_processing.html')
+        elif curr_order_status == "requires_payment_method":
+            return render(request, 'payment/payment_failed.html')
+        else:
+            return render(request, 'payment/payment_failed.html')
+    else:
+        return HttpResponse("Invalid request!", status=400)
 
 
 def buyer_signup(request):
@@ -446,43 +542,6 @@ def admin_removeproduct(request):
 
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
-
-
-# PAYMENTS
-
-def checkout(request):
-    if request.method == 'GET':
-        amount = 10000  # To be fetched from cart
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        res = stripe.PaymentIntent.create(
-            amount=amount,
-            currency='inr',
-            payment_method_types=['card'],
-            receipt_email='jenny.rosen@example.com',  # to be fetched from request.user
-        )
-        # store payment intent as transaction id in order and then confirm payment when on payment_complete/ url.
-        # print(res)
-    return render(request, 'payment/checkout.html', {'client_secret': res.client_secret, 'public_key': settings.STRIPE_PUBLIC_KEY})
-
-
-def payment_complete(request):
-    if request.method == 'GET':
-        payment_intent = request.GET.get('payment_intent')
-        payment_intent_client_secret = request.GET.get(
-            'payment_intent_client_secret')
-        redirect_status = request.GET.get('redirect_status')
-
-        # authenticate here that the user is the same as the one who made the payment
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        obj = stripe.PaymentIntent.retrieve(payment_intent)
-        if obj.status == 'succeeded':
-            return render(request, 'payment/payment_success.html')
-        elif obj.status == "processing":
-            return render(request, 'payment/payment_processing.html')
-        elif obj.status == "requires_payment_method":
-            return render(request, 'payment/payment_failed.html')
-        else:
-            return render(request, 'payment/payment_failed.html')
 
 
 class SellerAllView(ListView):
