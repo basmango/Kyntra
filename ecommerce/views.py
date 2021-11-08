@@ -265,6 +265,8 @@ def payment_complete(request):
                 product.quantity += order.quantity
                 product.save()
 
+        if first:
+            return redirect("index")
         if curr_order_status == 'succeeded':
             return render(request, 'payment/payment_success.html')
         elif curr_order_status == "processing":
