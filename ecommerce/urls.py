@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('admin/sellers/', views.admin_sellers, name='admin_sellers'),
     path('admin/sellers/<str:option>/', views.admin_sellers, name='admin_sellers'),
+    path('admin/selleractions/', views.admin_selleractions, name='admin_selleractions'),
 
     path('admin/products/', views.admin_products, name='admin_products'),
     path('admin/products/<str:option>/', views.admin_products, name='admin_products'),

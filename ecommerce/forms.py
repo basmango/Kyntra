@@ -57,18 +57,20 @@ class AdminAddProductsForm(forms.ModelForm):
             'seller': forms.Select(attrs={'class': 'form-select',}),
             'category': forms.Select(attrs={'class': 'form-select',}),
             'name': forms.TextInput(attrs={'class': 'form-control',}),
-            'price': forms.TextInput(attrs={'class': 'form-control',}),
+            'price': forms.NumberInput(attrs={'class': 'form-control',}),
             'description': forms.Textarea(attrs={'class': 'form-control','rows':"3"}),
-            'quantity': forms.TextInput(attrs={'class': 'form-control',}),
-            'rating': forms.TextInput(attrs={'class': 'form-control',}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control',}),
+            'rating': forms.NumberInput(attrs={'class': 'form-control',}),
         }
 
 class AdminRemoveProductsForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
 	class Meta:
 		model = Product
 		fields = ()
 
 class AdminRemoveBuyersForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
 	class Meta:
 		model = Buyer
 		fields = ()
@@ -87,6 +89,12 @@ class AddProductForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'}),
 
         }
+
+class AdminSellerActionsForm(forms.ModelForm):
+	id = forms.IntegerField(required=True)
+	class Meta:
+		model = Seller
+		fields = ()
     
 
 class OTPForm(forms.ModelForm):
