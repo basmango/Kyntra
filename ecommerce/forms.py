@@ -49,6 +49,7 @@ class AddProductForm(forms.ModelForm):
         }
     
 class SellerRemoveProductsForm(forms.ModelForm):
-	class Meta:
-		model = Product
-		fields = ()
+    id=forms.IntegerField(required=True)
+    class Meta:
+        model = Product
+        fields = ()

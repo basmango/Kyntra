@@ -258,14 +258,14 @@ def editProductFormView(request, id):
         model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
         model.save()
         form =AddProductForm()
-        return redirect('seller_all_products')
+        return HttpResponseRedirect("/kyntra/seller/all_products/")
 
     context={
         'form':form,
         'editing':True,
         'id':id
     }
-    return render(request, "seller/add_product.html", context)
+    return showAllProducts(request)
 
 
 def logoutView(request):
