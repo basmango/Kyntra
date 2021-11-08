@@ -41,7 +41,7 @@ class Seller(UserProfile):
 	company_name = models.CharField(max_length=100, blank=True, null=True)
 	gst_number = models.CharField(max_length=15, blank=True, null=True)
 	applied = models.BooleanField(default=False)
-	application_status = models.BooleanField(default=False)
+	approved = models.BooleanField(default=False)
 
 	def __str__(self):
 		return "Seller " + self.user.username
