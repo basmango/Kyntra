@@ -15,9 +15,9 @@
         </a>
           
         <div class="dropdown-menu bg-light" aria-labelledby="navbarDropdown" >
-          <a class="dropdown-item  " href="#" >Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-      
+          {% for i in categories %}
+          <a class="dropdown-item  " href="{% url 'search_results'  %}?category={{i}}" >{{i}}</a>
+          {% endfor %}
         </div>
     </li>
     </ul>
@@ -27,9 +27,16 @@
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
 <hr class = ".d-none .d-sm-block .d-md-none bg-success">
-  <button class = "nav-item btn btn-primary " style = "width:100px"> Sign Up</button>
+  
+  {% if user.is_authenticated %}
+ <h5 style = "color:white;"> Welcome, {{ user.first_name }} </h5>
+  {% else %}
+
+ <button class = "nav-item btn btn-primary " style = "width:100px"> Sign Up</button>
   
  <button class = "nav-item btn btn-secondary ml-2"> Login</button>
+  
+  {% endif %}
   </div>
 
  

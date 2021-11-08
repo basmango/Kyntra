@@ -1,0 +1,25 @@
+{% extends "general/general_base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block general_content %}
+{% load static %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<body>
+
+
+    <div class="jumbotron text-center">
+        <h1 class="display-3">Thank you for shopping with us!</h1>
+        <p class="lead"><strong></strong> We are currently processing your payment.</p>
+        <hr>
+        <p>
+            Having trouble? <a href="">Contact us</a>
+        </p>
+        <p class="lead">
+            <a class="btn btn-primary btn-sm" href="{% url 'index' %}" role="button">Continue
+                shopping</a>
+        </p>
+    </div>
+
+</body>
+
+{% endblock %}

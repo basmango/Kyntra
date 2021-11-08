@@ -28,7 +28,9 @@ SECRET_KEY = config('SECRET_KEY')
 # TODO: Change this
 DEBUG = True
 
-ALLOWED_HOSTS = ['kyntra.systems', 'www.kyntra.systems', '192.168.3.40', 'localhost']
+ALLOWED_HOSTS = ['kyntra.systems',
+                 'www.kyntra.systems', '192.168.3.40', 'localhost']
+
 
 # EMAIL SETTINGS
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -50,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'ecommerce'
+    'ecommerce',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ecommerce.context_processors.categories',
             ],
         },
     },
@@ -131,7 +134,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -141,7 +143,7 @@ STATIC_URL = '/static/'
 # ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -149,6 +151,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/redirect_user/'
 ADMIN_URL = 'random/suburl/here/admin/'
+
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET')
+
 # After HTTPS setup
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
