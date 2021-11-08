@@ -1,3 +1,4 @@
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.conf import settings
 # Create your models here.
@@ -42,7 +43,7 @@ class Seller(UserProfile):
 	gst_number = models.CharField(max_length=15, blank=True, null=True)
 	applied = models.BooleanField(default=False)
 	application_status = models.BooleanField(default=False)
-
+	document=models.FileField(storage=FileSystemStorage(location=settings.MEDIA_ROOT),upload_to='documents', default='settings.MEDIA_ROOT/media/default_file.txt')
 	def __str__(self):
 		return "Seller " + self.user.username
 

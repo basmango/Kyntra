@@ -117,6 +117,7 @@ def seller_signup(request):
 			user.save()
 			nextTime = datetime.datetime.now() + datetime.timedelta(minutes = 15)
 			otp = getRandomNumber()
+
 			Seller.objects.create(user=user, otp = otp, otp_expiry = nextTime, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True)
 			send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
 			return redirect('otp_verification')
@@ -318,4 +319,10 @@ def logoutView(request):
     logout(request)
     return HttpResponse("Logout Successful")
 
+def homeView(request):
+	# if(request.method=="POST"):
+	# 	file =request.FILES["file"]
+	# 	document=FilesUpload.objects.create(file=file)
+	# 	return HttpResponse("Success")
+	return render(request, "home.html", {})
 
