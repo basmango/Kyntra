@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from ecommerce.views import SignUpView, signup, buyer_signup, seller_signup, otp_verification, redirect_user
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),
     path('accounts/signup/', signup, name="signup" ),
     path('accounts/signup/buyer', buyer_signup, name="buyer_signup" ),
