@@ -27,12 +27,14 @@ class UserProfile(models.Model):
 
 class Buyer(UserProfile):
     address = models.OneToOneField(ShippingAddress, on_delete=models.CASCADE)
+    activated = models.BooleanField(default=False)
     def __str__(self):
         return "Buyer " + self.user.username
 
 class Seller(UserProfile):
     company_name = models.CharField(max_length=100, blank=True, null=True)
     gst_number = models.CharField(max_length=15, blank=True, null=True)
+    activated = models.BooleanField(default=False)
 
     def __str__(self):
         return "Seller " + self.user.username

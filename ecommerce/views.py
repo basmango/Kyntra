@@ -7,9 +7,22 @@ from django.http import HttpResponse
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm 
+from verify_email.email_handler import send_verification_email
+from django.views.generic.detail import DetailView
+from django.http import HttpResponse
 
 
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'general/individual_item.html'
+
+def int_or_0(value):
+    try:
+        return int(value)
+    except:
+        return 0
+    
 class SearchProductListView(ListView):
     model = Product
     paginate_by = 15
@@ -17,23 +30,65 @@ class SearchProductListView(ListView):
 
     def get_queryset(self): # new
         query = self.request.GET.get('product')
-        if not(query):
-            return  Product.objects.all()
-        object_list = Product.objects.filter(
-            Q(name__icontains=query) )
+        category = self.request.GET.get('category')
+        object_list = Product.objects.all();       
         
+        if query:
+            object_list = Product.objects.filter(
+            Q(name__icontains=query) )
+        if category:
+            object_list = object_list.filter(category__name=category)
         return object_list
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         query = self.request.GET.get('product')
+        category = self.request.GET.get('category')
+        
         if query==None:
             query=""
-            
-        context['title'] = f"Search results for '{query}' "
-        context['additional_q_params_for_pagination']  = f"product={query}"
+            if category:
+                context['title'] = f"Products in {category} "
+        
+        else:
+            if query:
+                context['title'] = f"Search results for  {query} "
+            if category:
+                context['title'] += f"in  {category} "
+        context['additional_q_params_for_pagination'] = ""
+        if query:
+            context['additional_q_params_for_pagination']  = f"product={query}"
+        if  category:
+            context['additional_q_params_for_pagination'] +=f"&category={category}"
+        
+        
         return context
     
+    
+class ProductCategoryListView(ListView):
+    model = Product
+    paginate_by = 10
+    template_name = 'general/home.html'
+
+    def get_queryset(self): # new
+        query = self.request.GET.get('category')
+        if not(query):
+            return  None;
+        object_list = Product.objects.filter(
+            Q(category=query) )
+        return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = self.request.GET.get('category')
+        if category==None:
+            category=""
+            
+        context['title'] = f"{category} products"
+        context['additional_q_params_for_pagination']  = f"category={category}"
+        return context
+        
+
 class ProductListView(ListView):
     model = Product
     paginate_by = 10
@@ -57,6 +112,22 @@ def update_user_data(user, phone):
 def signup(request):
     return render(request, 'registration/signup.html')
 
+
+def Purchase(request):
+    product_id = request.POST.get('product_id')
+    quantity = request.POST.get('item_count')
+    quantity = int_or_0(quantity)
+    
+    q_set = Product.objects.all().filter(id=product_id)
+    
+    if(len(q_set)!=1):
+        return HttpResponse(status=404)
+    if(q_set[0].quantity<quantity or quantity == 0):
+        return HttpResponse(status=404)
+    
+    
+    
+    return render(request, 'registration/signup.html')
 
 def buyer_signup(request):
     if request.method == 'POST':

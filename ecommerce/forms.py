@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 from django.contrib.auth.models import User
-
+from django.core.validators import MinValueValidator,MaxValueValidator
 from ecommerce.models import ShippingAddress
 
 class BuyerSignUpForm(UserCreationForm):
@@ -23,3 +23,4 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = ShippingAddress
         fields = ('address1', 'address2', 'city', 'country', 'zipcode')
+       
