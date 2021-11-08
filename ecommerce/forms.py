@@ -110,3 +110,8 @@ class OTPForm(forms.ModelForm):
             'otp': forms.NumberInput(),
             'email': forms.EmailInput()
         }
+class SellerRemoveProductsForm(forms.ModelForm):
+    id=forms.IntegerField(required=True)
+    class Meta:
+        model = Product
+        fields = ()

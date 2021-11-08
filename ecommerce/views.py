@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, request, HttpRespons
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm
+from .forms import AddressForm, BuyerSignUpForm, SellerRemoveProductsForm, SellerSignUpForm
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AddProductForm, OTPForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm, AdminSellerActionsForm
@@ -572,49 +572,58 @@ class SellerSearchView(ListView):
         return context
 
 
-def addProductFormView(request):
-    form = AddProductForm(request.POST or None)
-    if(form.is_valid()):
-        model = form.save(commit=False)
-        model.seller = Seller.objects.filter(id__exact=request.user.id)[0]
+def showAllProducts(request):
+	if(not request.user.is_authenticated):
+		return HttpResponse("Not Registered User")
+	requesting_user_id=request.user.id;
+	try:
+		authenticated_seller= Seller.objects.get(pk=requesting_user_id);
+		return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+	except Exception as e:
+		return HttpResponse("404 Error")
+		
 
+def addProductFormView(request):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.get(Q(id=request.user.id))
         model.save()
-        form = AddProductForm()
+        form =AddProductForm()
         return redirect('seller_all_products')
 
-    context = {
-        'form': form,
-        'editing': False
+    context={
+        'form':form,
+        'editing':False
     }
     return render(request, "seller/add_product.html", context)
-
 
 def editProductFormView(request, id):
-    instance = get_object_or_404(Product, id=id)
-    form = AddProductForm(request.POST or None, instance=instance)
+    instance=get_object_or_404(Product, id=id)
+    form =AddProductForm(request.POST or None, instance=instance)
     if(form.is_valid()):
-        model = form.save(commit=False)
-        model.seller = Seller.objects.filter(id__exact=request.user.id)[0]
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
         model.save()
-        form = AddProductForm()
+        form =AddProductForm()
         return redirect('seller_all_products')
 
-    context = {
-        'form': form,
-        'editing': True,
-        'id': id
+    context={
+        'form':form,
+        'editing':True,
+        'id':id
     }
     return render(request, "seller/add_product.html", context)
-
-
-def deleteProductFormView(request, id):
-    product = Product.objects().get(id=id)
-    if(request.method == "POST"):
-        product.delete()
-        return redirect('seller_all_products')
-    return redirect("seller_all_products")
-
 
 def logoutView(request):
     logout(request)
     return HttpResponse("Logout Successful")
+
+def seller_removeproduct(request):
+	if request.method == 'POST':
+		form = SellerRemoveProductsForm(request.POST)
+		if form.is_valid():
+			Product.objects.filter(id=request.POST['id']).delete()
+			return HttpResponseRedirect("/kyntra/seller/all_products/")
+
+	return showAllProducts(request)
