@@ -29,12 +29,14 @@
 <hr class = ".d-none .d-sm-block .d-md-none bg-success">
   
   {% if user.is_authenticated %}
- <h5 style = "color:white;"> Welcome, {{ user }} </h5>
+
+ <a href = "{% url 'logout'%}" class = "nav-item btn btn-primary " style = "width:100px"> Logout</a>
+  
   {% else %}
 
- <button class = "nav-item btn btn-primary " style = "width:100px"> Sign Up</button>
+ <a href = "{% url 'signup'%}" class = "nav-item btn btn-primary " style = "width:100px"> Sign Up</a>
   
- <button class = "nav-item btn btn-secondary ml-2"> Login</button>
+ <a href = "{% url 'login'%}" class = "nav-item btn btn-secondary ml-2">Login</a>
   
   {% endif %}
   </div>
