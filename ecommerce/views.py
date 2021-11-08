@@ -151,7 +151,8 @@ def index(request):
 def admin_check(request):
 	if request.user.is_authenticated:
 		if UserProfile.objects.filter(user=request.user):
-			if request.user.user_profile.is_admin:
+			user_profile = UserProfile.objects.get(user=request.user)
+			if user_profile.is_admin:
 					return True
 			else:
 					return False
