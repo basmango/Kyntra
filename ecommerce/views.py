@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse, HttpResponseRedirect, request
+from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
@@ -150,11 +150,11 @@ def index(request):
 
 def admin_check(request):
 	if request.user.is_authenticated:
-		user_profile = UserProfile.objects.get(user=request.user)
-		if user_profile.is_admin:
-				return True
-		else:
-				return False
+		if UserProfile.objects.filter(user=request.user):
+			if request.user.user_profile.is_admin:
+					return True
+			else:
+					return False
 	else:
 		return False
 
@@ -176,7 +176,7 @@ def admin_dashboard(request):
 			'pending_count':pen,
 			'product_count':p})
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 
 def admin_buyers(request, option = 'all'):
@@ -191,7 +191,7 @@ def admin_buyers(request, option = 'all'):
 			'buyer_count':buyer_count
 			})
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 def admin_removebuyer(request):
 	if admin_check(request) :
@@ -204,7 +204,7 @@ def admin_removebuyer(request):
 
 		return admin_buyers(request)
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 def admin_sellers(request, option="all"):
 	if admin_check(request) :
@@ -239,7 +239,7 @@ def admin_sellers(request, option="all"):
 			'unapproved_count':unapproved_count,
 			})
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 def admin_selleractions(request):
 	if admin_check(request) :
@@ -256,7 +256,7 @@ def admin_selleractions(request):
 
 		return admin_sellers(request)
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 
 def admin_products(request, option="all"):
@@ -290,7 +290,7 @@ def admin_products(request, option="all"):
 			'form':form,
 			})
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 def admin_addproduct(request):
 	if admin_check(request) :
@@ -317,7 +317,7 @@ def admin_addproduct(request):
 		# return render(request, 'admin/name.html', {'form': form})
 		return admin_products(request)
 	else:
-		return Http404()
+		return HttpResponseNotFound()
 
 def admin_removeproduct(request):
 	if admin_check(request) :
@@ -331,7 +331,7 @@ def admin_removeproduct(request):
 
 		return admin_products(request)
 	else:
-		return Http404()	
+		return HttpResponseNotFound()	
 
 
     # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
