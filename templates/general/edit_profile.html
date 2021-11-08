@@ -1,0 +1,61 @@
+{% extends 'general/general_base.html' %}
+{% load widget_tweaks %}
+
+{% block general_content %}
+<div class="row">
+    <div class="col-8 offset-2">
+        <h2 class="my-2 py-2">My Profile</h2>
+        <form method="post" action="{% url 'edit_profile' %}">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-floating mb-1 text-black py-2">
+                <div class="text-start">
+                    {{ field.label_tag }}
+                </div>
+                <div class="pt-2 text-start d-flex">
+                    {{field|add_class:'form-control'}}
+                    {% if field.help_text %}
+                    <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                        title="{{field.help_text}}">
+                        <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto" style="color: white;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% for error in field.errors %}
+                <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% if is_buyer %}
+            <h2>Address</h2>
+            {% for field in address_form %}
+            <div class="form-floating mb-1 text-black py-2">
+                <div class="text-start">
+                    {{ field.label_tag }}
+                </div>
+                <div class="pt-2 text-start d-flex">
+                    {{field|add_class:'form-control'}}
+                    {% if field.help_text %}
+                    <a class="align-items-center" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                        title="{{field.help_text}}">
+                        <i class="fas h-100 w-100 fa-question-circle py-2 px-2 my-auto" style="color: white;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% for error in field.errors %}
+                <div style="color: red" class="mt-1 small text-start">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+            <input class="btn btn-primary btn-lg" type="submit" value="Edit Details" />
+        </form>
+        <form method="post" action="{% url 'delete_account_request' %}">
+            {% csrf_token %}
+            <input class="btn btn-danger btn-lg" type="submit" value="Delete Account"></input>
+        </form>
+    </div>
+</div>
+{% endblock %}

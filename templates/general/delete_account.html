@@ -1,0 +1,73 @@
+{% extends 'registration/registration_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Delete Account | Kyntra{% endblock %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/vatmpad.js' %}"></script>
+
+<script>
+    var keyboard_generated = false;
+
+    function keyb_callback(char) {
+        var text =
+            document.getElementById("id_otp"),
+            val = text.value;
+
+        switch (char) {
+            case "BackSpace":
+                var min = (val.charCodeAt(val.length - 1) == 10) ? 2 : 1;
+                text.value = val.substr(0, val.length - min);
+                break;
+
+            case "Enter":
+                text.value += "\n";
+                break;
+
+            default:
+                text.value = text.value * 10 + Number(char);
+        }
+    }
+
+    function keyb_init() {
+        if (keyboard_generated) {
+            return;
+        } else {
+            keyboard_generated = true;
+            new VATMpad('keyboard', keyb_callback);
+        }
+    }
+</script>
+<section class="gradient-custom">
+    <div class="container py-5 h-75">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white" style="border-radius: 1rem">
+                    <div class="card-body p-5 text-center">
+                        <div class="mb-md-3 mt-md-2 pb-2">
+                            <h2 class="fw-bold mb-2 text-uppercase">Delete Account</h2>
+                            <form method="post" action="{% url 'delete_account' %}">
+                                {% csrf_token %}
+                                <div class="form-floating form-white mb-1 text-black py-2">
+                                    <div class="text-start text-white">
+                                        <label for="id_otp">OTP</label>
+                                    </div>
+                                    <div class="pt-2 text-start d-flex">
+                                        <input type="text" name="otp" id="id_otp" class="form-control"
+                                            style="width: 100%; border-radius: 0.25rem; border: 1px solid #fff;" />
+                                    </div>
+                                </div>
+                                <input class="btn btn-danger btn-lg px-5 mt-5 pt-lg-2" type="submit"
+                                    value="Delete Account" />
+                            </form>
+                            <div id="keyboard" style="color: black;"></div>
+                            <button class="btn btn-outline-light btn-lg px-5 mt-1" onclick="keyb_init()">Use virtual
+                                keyboard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
