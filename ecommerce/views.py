@@ -209,18 +209,17 @@ def admin_products(request, option="all"):
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
 
-# class SellerAllView(ListView):
-#     model=Product
-#     template_name='seller/all_products.html'
-#     def get_queryset(self): # new
-#         return  Product.objects.all()
-    
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title'] = "All Products"
-#         return context
+
 def showAllProducts(request):
-	return render(request, 'seller/all_products.html', {"object_list":Product.objects.all()})
+	if(not request.user.is_authenticated):
+		return HttpResponse("Not Registered User")
+	requesting_user_id=request.user.id;
+	try:
+		authenticated_seller= Seller.objects.get(pk=requesting_user_id);
+		return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+	except Exception as e:
+		return HttpResponse("404 Error")
+		
 
 class SellerSearchView(ListView):
     model =Product
