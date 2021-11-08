@@ -221,18 +221,6 @@ def showAllProducts(request):
 		return HttpResponse("404 Error")
 		
 
-class SellerSearchView(ListView):
-    model =Product
-    template_name='seller/all_products.html'
-
-    def get_queryset(self):
-        query = self.request.GET.get('query')
-        return Product.objects.filter(name__icontains=query)
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = "query"
-        return context
-
 def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):

@@ -12,7 +12,6 @@ urlpatterns = [
     path('admin/sellers/<str:option>/', views.admin_sellers, name='admin_sellers'),
     path('admin/products/', views.admin_products, name='admin_products'),
     path('seller/all_products/', views.showAllProducts, name='seller_all_products'),
-    path('seller/all_products', views.SellerSearchView.as_view(), name='seller_searched_products'),
     path('seller/add_product/', views.addProductFormView, name='add_product'),
     path('seller/edit_product/<int:id>/', views.editProductFormView, name='edit_product'),
     # path('seller/delete_product', views.deleteProductFormView, name='delete_product'),
