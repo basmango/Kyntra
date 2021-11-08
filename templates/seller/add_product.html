@@ -1,0 +1,37 @@
+{% extends "seller/seller_base.html" %}
+
+{% block content %}
+
+
+<main>
+    <div class="container card mt-3 py-3 ">
+        {% if editing %}
+        <p class="fs-4">Edit Product</p>
+        {% endif %}
+        {% if not editing %}
+        <p class="fs-4">Add Product</p>
+        {% endif %}
+        <hr />
+        <form method='POST'>
+            {% csrf_token %}
+            {{form.as_p}}
+            <div class="d-grid gap-2">
+                {% if not editing %}
+                <input type="submit" class="btn btn-primary" value="Add New Product" />
+                {% endif %}
+                {% if editing %}
+                <input type="submit" class="btn btn-primary" value="Save Product" />
+                <input  class="btn btn-danger" value="Delete Product" />
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+</main>
+<script type="text/javascript">
+    var add_product_button = document.getElementById('add_product_button');
+    add_product_button.style.visibility = 'hidden';
+
+
+</script>
+{% endblock %}

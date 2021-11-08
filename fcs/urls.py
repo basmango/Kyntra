@@ -17,13 +17,15 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from ecommerce.views import SignUpView, signup, buyer_signup, seller_signup,ProductDetailView
+from ecommerce.views import SignUpView, signup, buyer_signup, seller_signup,ProductDetailView,otp_verification, redirect_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),
     path('accounts/signup/', signup, name="signup" ),
     path('accounts/signup/buyer', buyer_signup, name="buyer_signup" ),
+    path('accounts/verify', otp_verification, name="otp_verification" ),
+    path('redirect_user/', redirect_user, name="redirect_user" ),
     path('accounts/signup/seller', seller_signup, name="seller_signup" ),
     path('kyntra/', include('ecommerce.urls')),
     path('verification/', include('verify_email.urls')),

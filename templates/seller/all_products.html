@@ -1,87 +1,38 @@
-{% extends "admin/admin_base.html" %}
+{% extends "seller/seller_base.html" %}
 
 {% block content %}
 
-<!-- Modal -->
-<div class="modal fade" id="locModal" tabindex="-1" role="dialog" aria-labelledby="locModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="locModalLabel">Add Product</h5>
 
-            </div>
-            <div class="modal-body">
-                <form action="" id="w-form">
-                    <div class="form-group">
-                        <label for="product-title"> Product Title</label>
-                        <input type="text" class="form-control mb-3" id="product-title">
-                    </div>
-                    <div class="form-group">
-                        <label for="product-price"> Price </label>
-
-                        <div class="input-group mb-3">
-
-                            <span class="input-group-text">Rs.</span>
-                            <input type="number" class="form-control" id="product-price"
-                                aria-label="Amount (to the nearest dollar)">
-                            <span class="input-group-text">.00</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="product-decription"> Description </label>
-                        <input type="text" class="form-control mb-3" id="product-decription">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="product-images"> Selct Images </label>
-
-                        <input type="file" class="form-control" id="product-images" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button id="w-change-close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="w-change-btn" type="button" class="btn btn-primary">Add Product</button>
-            </div>
-        </div>
-    </div>
-</div>
-<main class="mt-5 pt-4">
+<main>
     <div class="container dark-grey-text">
 
-        <!--Grid row-->
-        <div class="row d-flex justify-content-center wow fadeIn">
-
-            <!--Grid column-->
-
-            <form class="d-flex m-3">
-                <input type="text" class="form-control" aria-label="Default"
-                    aria-describedby="inputGroup-sizing-default">
-
-                <button id="add-project-button" type="button" class="btn btn-primary mx-2" data-toggle="modal"
-                    data-target="#locModal">Add</button>
-            </form>
-            <!--Grid column-->
-
+        <div class="input-group my-3">
+            <input type="text" class="form-control" placeholder="Search for Item" aria-label="Search for Item"
+                aria-describedby="button-addon2">
+            <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
         </div>
-        <!--Grid row-->
+
 
         <!--Grid row-->
         <div class="row wow fadeIn">
-            {% for item in products %}
+            {% for item in object_list%}
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card text-center">
-                    <img draggable="false" src="{{item.image_uri}}" class="card-img-top " alt="...">
+                    <img draggable="false" style="height:300px; width:auto;object-fit: cover"
+                        src="{{item.productimage_set.all.0.image.url }}"
+                        class="card-img-top " alt="...">
                     <div class="card-body ">
                         <h5>{{item.name}}
-                            <span class="badge bg-danger mx-1">{{item.supertag}}</span>
+                            {% if item.quantity == 0 %}
+                            <span class="badge bg-danger mx-1">SOLD OUT</span>
+                            {% endif %}
                         </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Price: Rs.{{item.price}}</h6>
                         <p class="card-text">{{item.description}}</p>
-                        <a href="" class="btn btn-primary">Check Sales</a>
+                        <a href="{% url 'edit_product' id=item.id %}" class="btn btn-primary">Edit Product</a>
                         <br />
-                        <a href="" id="edit-product-button" class="card-link">Edit</a>
+
                     </div>
 
                 </div>
@@ -92,24 +43,5 @@
 
     </div>
 </main>
-<script type="text/javascript">
-    var locModal = document.getElementById('locModal');
-    var btnclose = document.getElementById('w-change-close');
-    var btnShow = document.getElementById('add-project-button');
-    
 
-    //show the modal
-    btnShow.addEventListener('click', (e) => {
-        locModal.style.display = "block";
-        locModal.style.paddingRight = "17px";
-        locModal.className = "modal fade show";
-    });
-    
-    //hide the modal
-    btnclose.addEventListener('click', (e) => {
-        locModal.style.display = "none";
-        locModal.className = "modal fade";
-    });
-
-</script>
 {% endblock %}

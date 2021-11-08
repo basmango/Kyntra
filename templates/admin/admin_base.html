@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-{% block body %}
+{% block navigation %}
 <!-- Navbar -->
 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
 	<div class="container-lg">
@@ -11,23 +11,26 @@
 		<div class="collapse navbar-collapse" id="#navmenu">
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item">
-					<a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.path == '/kyntra/admin/' %} active {% endif %}">Dashboard</a>
+					<a href="{% url 'admin_dashboard' %}" class="nav-link {% if name  == 'admin_dashboard' %} active {% endif %}">Dashboard</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_buyers' %}" class="nav-link {% if request.path == '/kyntra/admin/buyers/' %} active {% endif %}">Buyers</a>
+					<a href="{% url 'admin_buyers' %}" class="nav-link {% if  name  == 'admin_buyers' %} active {% endif %}">Buyers</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_sellers' %}" class="nav-link {% if request.path == '/kyntra/admin/sellers/' %} active {% endif %}">Sellers</a>
+					<a href="{% url 'admin_sellers' %}" class="nav-link {% if name  == 'admin_sellers' %} active {% endif %}">Sellers</a>
 				</li>
 				<li class="nav-item">
-					<a href="{% url 'admin_products' %}" class="nav-link {% if request.path == '/kyntra/admin/products/' %} active {% endif %}">Products</a>
+					<a href="{% url 'admin_products' %}" class="nav-link {% if name  == 'admin_products' %} active {% endif %}">Products</a>
+				</li>
+				<li class="nav-item">
+					<a href="{% url 'logout' %}" class="nav-link text-danger">Logout</a>
 				</li>
 			</ul>
 		</div>
 	</div>
 </nav>
+{% endblock %}
 
 {% block content %}
 {% endblock %}
 
-{% endblock %}
