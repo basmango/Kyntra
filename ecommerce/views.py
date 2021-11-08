@@ -1,4 +1,5 @@
 from django.db.models.deletion import PROTECT
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
@@ -8,7 +9,7 @@ from django.http import HttpResponse, request
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm,SellerRemoveProductsForm
 
 
 class SearchProductListView(ListView):
@@ -208,16 +209,18 @@ def admin_products(request, option="all"):
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
 
-class SellerAllView(ListView):
-    model=Product
-    template_name='seller/all_products.html'
-    def get_queryset(self): # new
-        return  Product.objects.all()
+# class SellerAllView(ListView):
+#     model=Product
+#     template_name='seller/all_products.html'
+#     def get_queryset(self): # new
+#         return  Product.objects.all()
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "All Products"
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['title'] = "All Products"
+#         return context
+def showAllProducts(request):
+	return render(request, 'seller/all_products.html', {"object_list":Product.objects.all()})
 
 class SellerSearchView(ListView):
     model =Product
@@ -264,15 +267,17 @@ def editProductFormView(request, id):
     }
     return render(request, "seller/add_product.html", context)
 
-def deleteProductFormView(request , id):
-    product=Product.objects().get(id=id)
-    if(request.method=="POST"):
-        product.delete()
-        return redirect('seller_all_products')
-    return redirect("seller_all_products")
 
 def logoutView(request):
     logout(request)
     return HttpResponse("Logout Successful")
 
+def seller_removeproduct(request):
+	if request.method == 'POST':
+		form = SellerRemoveProductsForm(request.POST)
+		if form.is_valid():
+			Product.objects.filter(id=request.POST['id']).delete()
+			return HttpResponseRedirect("/kyntra/seller/all_products/")
+
+	return showAllProducts(request)
 

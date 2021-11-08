@@ -48,3 +48,7 @@ class AddProductForm(forms.ModelForm):
 
         }
     
+class SellerRemoveProductsForm(forms.ModelForm):
+	class Meta:
+		model = Product
+		fields = ()
