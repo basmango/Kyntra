@@ -10,7 +10,9 @@ from django.http import HttpResponse, HttpResponseRedirect, request, HttpRespons
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerProfileForm, BuyerSignUpForm, SellerProfileForm, SellerSignUpForm
+
+from .forms import AddressForm, BuyerSignUpForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
+
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
 from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AddProductForm, OTPForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm, AdminSellerActionsForm
@@ -306,7 +308,7 @@ def buyer_signup(request):
 
 def seller_signup(request):
     if request.method == 'POST':
-        form = SellerSignUpForm(request.POST)
+        form = SellerSignUpForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             user.refresh_from_db()
@@ -314,7 +316,7 @@ def seller_signup(request):
             nextTime = datetime.datetime.now() + datetime.timedelta(minutes=15)
             otp = getRandomNumber()
             Seller.objects.create(user=user, otp=otp, otp_expiry=nextTime, company_name=form.cleaned_data.get(
-                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True)
+                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'])
             send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             return redirect('otp_verification')
@@ -322,7 +324,6 @@ def seller_signup(request):
         form = SellerSignUpForm()
 
     return render(request, 'registration/seller_signup.html', {'form': form})
-
 
 def redirect_user(request):
     if request.user.is_authenticated:
@@ -574,52 +575,62 @@ class SellerSearchView(ListView):
         return context
 
 
-def addProductFormView(request):
-    form = AddProductForm(request.POST or None)
-    if(form.is_valid()):
-        model = form.save(commit=False)
-        model.seller = Seller.objects.filter(id__exact=request.user.id)[0]
+def showAllProducts(request):
+	if(not request.user.is_authenticated):
+		return HttpResponse("Not Registered User")
+	requesting_user_id=request.user.id;
+	try:
+		authenticated_seller= Seller.objects.get(pk=requesting_user_id);
+		return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+	except Exception as e:
+		return HttpResponse("404 Error")
+		
 
+def addProductFormView(request):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.get(Q(id=request.user.id))
         model.save()
-        form = AddProductForm()
+        form =AddProductForm()
         return redirect('seller_all_products')
 
-    context = {
-        'form': form,
-        'editing': False
+    context={
+        'form':form,
+        'editing':False
     }
     return render(request, "seller/add_product.html", context)
-
 
 def editProductFormView(request, id):
-    instance = get_object_or_404(Product, id=id)
-    form = AddProductForm(request.POST or None, instance=instance)
+    instance=get_object_or_404(Product, id=id)
+    form =AddProductForm(request.POST or None, instance=instance)
     if(form.is_valid()):
-        model = form.save(commit=False)
-        model.seller = Seller.objects.filter(id__exact=request.user.id)[0]
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
         model.save()
-        form = AddProductForm()
+        form =AddProductForm()
         return redirect('seller_all_products')
 
-    context = {
-        'form': form,
-        'editing': True,
-        'id': id
+    context={
+        'form':form,
+        'editing':True,
+        'id':id
     }
     return render(request, "seller/add_product.html", context)
-
-
-def deleteProductFormView(request, id):
-    product = Product.objects().get(id=id)
-    if(request.method == "POST"):
-        product.delete()
-        return redirect('seller_all_products')
-    return redirect("seller_all_products")
-
 
 def logoutView(request):
     logout(request)
     return HttpResponse("Logout Successful")
+
+
+def seller_removeproduct(request):
+	if request.method == 'POST':
+		form = SellerRemoveProductsForm(request.POST)
+		if form.is_valid():
+			Product.objects.filter(id=request.POST['id']).delete()
+			return HttpResponseRedirect("/kyntra/seller/all_products/")
+
+	return showAllProducts(request)
 
 
 def editProfileView(request):
@@ -755,3 +766,4 @@ def deleteAccount(request):
             user_profile.save()
             return redirect('edit_profile')
     return render(request, 'general/delete_account.html')
+

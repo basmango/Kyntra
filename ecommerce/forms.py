@@ -33,12 +33,12 @@ class BuyerSignUpForm(UserCreationForm):
 class SellerSignUpForm(UserCreationForm):
     company_name = forms.CharField(max_length=256, required=True)
     gst_number = forms.CharField(max_length=15, required=True)
-
+    document=forms.FileField(required=True)
     class Meta:
         model = User
         labels = {"company_name": "Company Name", "gst_number": "GST Number"}
         fields = ('username', 'email', 'password1',
-                  'password2', 'company_name', 'gst_number')
+                  'password2', 'company_name', 'gst_number','document')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -123,6 +123,12 @@ class OTPForm(forms.ModelForm):
             'otp': forms.NumberInput(),
             'email': forms.EmailInput()
         }
+
+class SellerRemoveProductsForm(forms.ModelForm):
+    id=forms.IntegerField(required=True)
+    class Meta:
+        model = Product
+        fields = ()
 
 
 class BuyerProfileForm(forms.ModelForm):
