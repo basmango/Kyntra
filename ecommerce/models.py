@@ -17,6 +17,12 @@ class ShippingAddress(models.Model):
 class UserProfile(models.Model):
 	user = models.OneToOneField(
 		settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	otp = models.PositiveSmallIntegerField(default=0)
+	otp_expiry = models.DateTimeField(null=True, blank=True)
+	is_verified = models.BooleanField(default=False)
+	is_buyer = models.BooleanField(default=False)
+	is_seller = models.BooleanField(default=False)
+	is_admin = models.BooleanField(default=False)
 	# phone = models.CharField(max_length=20, blank=True, null=True)
 	photo_url = models.ImageField(
 		upload_to="media", blank=True, null=True)
@@ -31,6 +37,7 @@ class Buyer(UserProfile):
 		return "Buyer " + self.user.username
 
 class Seller(UserProfile):
+
 	company_name = models.CharField(max_length=100, blank=True, null=True)
 	gst_number = models.CharField(max_length=15, blank=True, null=True)
 	applied = models.BooleanField(default=False)
@@ -38,6 +45,7 @@ class Seller(UserProfile):
 
 	def __str__(self):
 		return "Seller " + self.user.username
+
 
 
 class Category(models.Model):

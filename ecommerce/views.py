@@ -1,13 +1,22 @@
-from django.shortcuts import redirect, render
+from django.conf import settings
+from django.db.models.deletion import PROTECT
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views import generic
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, request
 from django.views.generic.list import ListView
-from ecommerce.models import Buyer, Seller, ShippingAddress, UserProfile, Product, Category
+from ecommerce.models import Buyer, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm
+from .forms import AddressForm, BuyerSignUpForm, SellerSignUpForm,AddProductForm, OTPForm, AdminAddProductsForm, AdminRemoveProductsForm, AdminRemoveBuyersForm
+import random
+import datetime
+from django.core.mail import send_mail
+
+def getRandomNumber():
+    return random.randint(100000, 999999)
 
 class SearchProductListView(ListView):
 	model = Product
@@ -57,6 +66,27 @@ def signup(request):
 	return render(request, 'registration/signup.html')
 
 
+def otp_verification(request):
+	if request.method == 'POST':
+		form = OTPForm(request.POST)
+		if form.is_valid():
+			otp = form.cleaned_data.get('otp')
+			email = form.cleaned_data.get('email')
+		user = UserProfile.objects.get(user__email=email)
+		tzinfo = datetime.timezone(datetime.timedelta(0))
+		currTime = datetime.datetime.now(tzinfo)
+		if otp == user.otp and currTime < user.otp_expiry and user.is_verified == False:
+			user.is_verified = True
+			user.save()
+			return redirect('login')
+		else:
+			user.delete()
+			return HttpResponse("Invalid OTP! User is requested to sign up again to get another OTP.")
+	else:	
+		form = OTPForm()
+	return render(request, 'registration/otp_verification.html', {'form': form})
+
+
 def buyer_signup(request):
 	if request.method == 'POST':
 		form = BuyerSignUpForm(request.POST)
@@ -65,14 +95,13 @@ def buyer_signup(request):
 			user = form.save()
 			address = address_form.save()
 			user.refresh_from_db()
-			Buyer.objects.create(user=user, address=address)
+			nextTime = datetime.datetime.now() + datetime.timedelta(minutes = 15)
+			otp = getRandomNumber()
+			Buyer.objects.create(user=user, address=address, otp = otp, otp_expiry = nextTime, is_buyer = True)
+			send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
 			user.save()
 			address.save()
-			raw_password = form.cleaned_data.get('password1')
-			# login user after signing up
-			user = authenticate(username=user.username, password=raw_password)
-			login(request, user)            
-			return redirect('index')
+			return redirect('otp_verification')
 	else:
 		form = BuyerSignUpForm()
 		address_form = AddressForm()
@@ -85,19 +114,35 @@ def seller_signup(request):
 		if form.is_valid():
 			user = form.save()
 			user.refresh_from_db()
-			Seller.objects.create(user=user, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'))
 			user.save()
-			raw_password = form.cleaned_data.get('password1')
-			# login user after signing up
-			user = authenticate(username=user.username, password=raw_password)
-			login(request, user)
-			# TODO Change to seller registration for document upload etc.
-			return redirect('index')
+			nextTime = datetime.datetime.now() + datetime.timedelta(minutes = 15)
+			otp = getRandomNumber()
+			Seller.objects.create(user=user, otp = otp, otp_expiry = nextTime, company_name=form.cleaned_data.get('company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True)
+			send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+			return redirect('otp_verification')
 	else:
 		form = SellerSignUpForm()
 
 	return render(request,'registration/seller_signup.html', {'form': form})
 
+
+
+def redirect_user(request):
+	if request.user.is_authenticated:
+		user_profile = UserProfile.objects.get(user=request.user)
+		if user_profile.is_verified:
+			if user_profile.is_seller:
+				return redirect('seller_all_products')
+			elif user_profile.is_buyer:
+				return redirect('index')
+			elif user_profile.is_admin:
+				return redirect('admin_dashboard')
+			else:
+				return Http404()
+		else:
+			return redirect('otp_verification')
+	else:
+		return redirect('login')
 
 
 def index(request):
@@ -245,53 +290,76 @@ def admin_removeproduct(request):
 
 	return admin_products(request)
 
-def seller_all_products(request):
-	products = [
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-		{
-			"name": "Phone",
-			"price": 100,
-			"description":"This is a phone",
-			"supertag": "SOLD",
-			"image_uri": "https://media.istockphoto.com/photos/mobile-phone-top-view-with-white-screen-picture-id1161116588?k=20&m=1161116588&s=612x612&w=0&h=NKv_O5xQecCHZic53onobxjqGfW7I-D-tBrzXaPbj_Q="
-		},
-   
-	]
-	return render(request, 'seller/all_products.html', {'name': 'seller_all_products',"products":products})
+
+    # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho  
 def seller_registration(request):
-	return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+    return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
+
+class SellerAllView(ListView):
+    model=Product
+    template_name='seller/all_products.html'
+    def get_queryset(self): # new
+        return  Product.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "All Products"
+        return context
+
+class SellerSearchView(ListView):
+    model =Product
+    template_name='seller/all_products.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        return Product.objects.filter(name__icontains=query)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = "query"
+        return context
+
+def addProductFormView(request):
+    form =AddProductForm(request.POST or None)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        
+        model.save()
+        form =AddProductForm()
+        return redirect('seller_all_products')
+
+    context={
+        'form':form,
+        'editing':False
+    }
+    return render(request, "seller/add_product.html", context)
+
+def editProductFormView(request, id):
+    instance=get_object_or_404(Product, id=id)
+    form =AddProductForm(request.POST or None, instance=instance)
+    if(form.is_valid()):
+        model =form.save(commit=False)
+        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+        model.save()
+        form =AddProductForm()
+        return redirect('seller_all_products')
+
+    context={
+        'form':form,
+        'editing':True,
+        'id':id
+    }
+    return render(request, "seller/add_product.html", context)
+
+def deleteProductFormView(request , id):
+    product=Product.objects().get(id=id)
+    if(request.method=="POST"):
+        product.delete()
+        return redirect('seller_all_products')
+    return redirect("seller_all_products")
+
+def logoutView(request):
+    logout(request)
+    return HttpResponse("Logout Successful")
+
+
