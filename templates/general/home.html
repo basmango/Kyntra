@@ -14,10 +14,9 @@
                         <h5>{{item.name}}
                             <span class="badge bg-danger mx-1">{{item.supertag}}</span>
                         </h5>
-                        <p class="card-text">{{item.description}}</p>
-                        <a href="" class="btn btn-success m-2">Add to cart 🛒</a>
-                      
-                        <a href="" id="edit-product-button" class="btn btn-secondary ">View Product 🔍</a>
+                        <p class="card-text">Rs. {{ item.price }}</p>
+                        
+                        <a href= '{% url 'product' item.id %}' id="edit-product-button" class="btn btn-secondary ">View Product 🔍</a>
                     </div>
 
                 </div>

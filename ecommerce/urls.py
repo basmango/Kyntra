@@ -30,5 +30,7 @@ urlpatterns = [
     path('search/',views.SearchProductListView.as_view(),name="search_results"),
     path('checkout/', views.checkout, name='checkout'),
     path('checkout/complete/', views.payment_complete, name='payment_complete'),
+    path('product/<pk>/', views.ProductDetailView.as_view(), name='product'),
+    path('purchase/',views.Purchase,name="purchase_endpoint"),
     path('logout/',views.logoutView, name ='logout')
 ]  

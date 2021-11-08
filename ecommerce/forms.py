@@ -3,6 +3,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator,MaxValueValidator
+from ecommerce.models import ShippingAddress
+
 from django.forms import fields
 from django.db.models import fields
 from django.forms import widgets
@@ -48,6 +51,7 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = ShippingAddress
         fields = ('address1', 'address2', 'city', 'country', 'zipcode')
+
 
 class AdminAddProductsForm(forms.ModelForm):
 	class Meta:
