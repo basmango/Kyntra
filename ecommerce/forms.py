@@ -101,7 +101,6 @@ class AddProductForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-
         }
 
 
