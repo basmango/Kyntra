@@ -93,7 +93,7 @@ class AddProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'price', 'description',
-                  'quantity', "seller", "category"]
+                  'quantity', "seller", "category","image1","image2"]
         exclude = ["seller"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
