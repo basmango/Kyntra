@@ -91,7 +91,7 @@
 												<input type="hidden" value="{{ seller.id }}" id="id" name="id">
 											
 												{% if seller.applied == True %}
-												<a href="" class="btn btn-outline-primary">View documents</a>
+												<a href="{{seller.document.url}}" class="btn btn-outline-primary">View documents</a>
 
 												<div class="btn-group" role="group" aria-label="Basic example">
 												{% if seller.approved == False %}
