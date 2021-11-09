@@ -29,7 +29,32 @@
 <hr class = ".d-none .d-sm-block .d-md-none bg-success">
   
   {% if user.is_authenticated %}
+    {% if user.userprofile.is_admin %}
+     <li class="nav-item dropdown  ">
 
+    <a class="nav-link dropdown-toggle text-muted" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Admin
+        </a>
+     <div class="dropdown-menu bg-light" aria-labelledby="navbarDropdown" id = "dp2" >
+          <a class="dropdown-item  " href="{% url 'admin_dashboard'  %}" >Dashboard</a>
+        </div>
+        </li>
+    {% endif %}
+
+     {% if user.userprofile.is_seller %}
+          <li class="nav-item dropdown  ">
+
+      <a class="nav-link dropdown-toggle text-muted" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Seller
+        </a>
+    <div class="dropdown-menu bg-light" aria-labelledby="navbarDropdown" >
+          <a class="dropdown-item  " href="{% url 'seller_all_products'  %}" >View Products</a>
+          <a class="dropdown-item " href="{% url 'add_product'  %}" >Add new product</a>
+           <a class="dropdown-item  " href="{% url 'seller_removeproduct'  %}" >Remove product</a>
+        </div>
+                </li>
+
+    {% endif %}
  <a href = "{% url 'logout'%}" class = "nav-item btn btn-primary " style = "width:100px"> Logout</a>
   
   {% else %}
