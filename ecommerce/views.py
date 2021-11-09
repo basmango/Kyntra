@@ -283,6 +283,8 @@ def payment_complete(request):
 
 
 def buyer_signup(request):
+    if(request.user.is_authenticated):
+        return redirect('index')
     if request.method == 'POST':
         form = BuyerSignUpForm(request.POST)
         address_form = AddressForm(request.POST)
@@ -307,6 +309,8 @@ def buyer_signup(request):
 
 
 def seller_signup(request):
+    if(request.user.is_authenticated):
+        return redirect('index')
     if request.method == 'POST':
         form = SellerSignUpForm(request.POST, request.FILES)
         if form.is_valid():
@@ -590,7 +594,7 @@ def addProductFormView(request):
     form =AddProductForm(request.POST or None)
     if(form.is_valid()):
         model =form.save(commit=False)
-        model.seller=Seller.objects.get(Q(id=request.user.id))
+        model.seller=Seller.objects.get(user=request.user)
         model.save()
         form =AddProductForm()
         return redirect('seller_all_products')
