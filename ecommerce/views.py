@@ -604,7 +604,7 @@ def addProductFormView(request):
 
 def editProductFormView(request, id):
     instance=get_object_or_404(Product, id=id)
-    form =AddProductForm(request.POST or None, instance=instance)
+    form =AddProductForm(request.POST or None, request.FILES,instance=instance)
     if(form.is_valid()):
         model =form.save(commit=False)
         model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
