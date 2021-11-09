@@ -587,10 +587,11 @@ def showAllProducts(request):
 		
 
 def addProductFormView(request):
-    form =AddProductForm(request.POST or None)
+    form =AddProductForm(request.POST or None,request.FILES)
     if(form.is_valid()):
         model =form.save(commit=False)
-        model.seller=Seller.objects.get(Q(id=request.user.id))
+       
+        model.seller=Seller.objects.get(Q(user = request.user))
         model.save()
         form =AddProductForm()
         return redirect('seller_all_products')
