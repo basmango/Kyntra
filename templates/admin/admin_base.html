@@ -23,6 +23,9 @@
 					<a href="{% url 'admin_products' %}" class="nav-link {% if name  == 'admin_products' %} active {% endif %}">Products</a>
 				</li>
 				<li class="nav-item">
+					<a href="{% url 'admin_logs' %}" class="nav-link {% if name  == 'admin_logs' %} active {% endif %}">Logs</a>
+				</li>
+				<li class="nav-item">
 					<a href="{% url 'logout' %}" class="nav-link text-danger">Logout</a>
 				</li>
 			</ul>

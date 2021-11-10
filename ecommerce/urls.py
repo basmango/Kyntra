@@ -19,14 +19,16 @@ urlpatterns = [
     path('admin/products/<str:option>/', views.admin_products, name='admin_products'),
     path('admin/addproducts/', views.admin_addproduct, name='admin_addproduct'),
     path('admin/removeproducts/', views.admin_removeproduct, name='admin_removeproduct'),
+    path('admin/logs/', views.admin_logs, name='admin_logs'),
 
 
+
+    path('seller/unapproved', views.unapproved_seller,name="unapproved"),
+    path('seller/rejected', views.rejected_seller,name="rejected"),
     path('seller/all_products/', views.showAllProducts, name='seller_all_products'),
-    # path('seller/all_products/search/', views.SellerSearchView.as_view(), name='seller_searched_products'),
     path('seller/add_product/', views.addProductFormView, name='add_product'),
-    path('seller/edit_product/<int:id>/', views.editProductFormView, name='edit_product'),
-     path('seller/removeproducts/', views.seller_removeproduct, name='seller_removeproduct'),
-    # path('seller/delete_product/<int:id>/', views.deleteProductFormView, name='delete_product'),
+    path('seller/edit_product/<pk>/', views.EditProductView.as_view(), name='edit_product'),
+    path('seller/removeproducts/<pk>', views.RemoveProductView.as_view(), name='seller_removeproduct'),
     path('seller/registration/', views.seller_registration, name='seller_registration'),
     path('search/',views.SearchProductListView.as_view(),name="search_results"),
     path('checkout/complete/', views.payment_complete, name='payment_complete'),

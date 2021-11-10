@@ -29,8 +29,8 @@
                             {% endif %}
                         </h5>
                         <h6 class="card-subtitle mb-2 text-muted">Price: Rs.{{item.price}}</h6>
-                        <p class="card-text">{{item.description}}</p>
-                        <a href="{% url 'edit_product' id=item.id %}" class="btn btn-primary">Edit Product</a>
+
+                        <a href="{% url 'edit_product' pk=item.id %}" class="btn btn-primary">Edit Product</a>
                         <br />
 
                     </div>

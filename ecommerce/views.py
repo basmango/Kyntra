@@ -6,14 +6,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-
-from .forms import AddressForm, BuyerSignUpForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
+from django.views.generic.edit import DeleteView, UpdateView
+from .forms import AddressForm, BuyerSignUpForm, EditProductForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
 
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
@@ -34,7 +36,7 @@ def int_or_0(value):
     except:
         return 0
 
-
+# http://127.0.0.1:8000/kyntra/seller/edit_product/13/
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'general/individual_item.html'
@@ -215,6 +217,8 @@ def Purchase(request):
         order.save()
         product.quantity -= quantity
         product.save()
+        
+        LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=product.id, object_repr=product.name, action_flag=2)
 
         return render(request, 'payment/checkout.html',
                     {
@@ -303,6 +307,7 @@ def buyer_signup(request):
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             user.save()
             address.save()
+            LogEntry.objects.log_action(user_id=user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=user.id, object_repr=user.username, action_flag=1)
             return redirect('otp_verification')
     else:
         form = BuyerSignUpForm()
@@ -324,6 +329,7 @@ def seller_signup(request):
                 'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'], applied=True)
             send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            LogEntry.objects.log_action(user_id=user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=user.id, object_repr=user.username, action_flag=1)
             return redirect('otp_verification')
     else:
         form = SellerSignUpForm()
@@ -408,10 +414,12 @@ def admin_removebuyer(request):
         if request.method == 'POST':
             form = AdminRemoveBuyersForm(request.POST)
             if form.is_valid():
-                User.objects.filter(id = Buyer.objects.get(id=form.cleaned_data['id']).user.id).delete()
-                Buyer.objects.filter(id=form.cleaned_data['id']).delete()
+                buyer = Buyer.objects.get(id=form.cleaned_data['id'])
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
+                User.objects.filter(id = buyer.user.id).delete()
+                buyer.delete()
 
-                return HttpResponseRedirect('/kyntra/admin/buyers/')
+                return redirect('admin_buyers')
 
         return admin_buyers(request)
     else:
@@ -459,17 +467,20 @@ def admin_selleractions(request):
         if request.method == 'POST':
             form = AdminSellerActionsForm(request.POST)
             if form.is_valid():
+                seller = Seller.objects.get(id=form.cleaned_data['id'])
                 if('approveButton' in request.POST):
-                    Seller.objects.filter(
-                        id=form.cleaned_data['id']).update(approved=True)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=True)
+
                 if('rejectButton' in request.POST):
-                    Seller.objects.filter(id=form.cleaned_data['id']).update(
-                        approved=False, applied=False)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=False, applied=False)
                 if('deleteButton' in request.POST):
-                    User.objects.filter(id = Seller.objects.get(id=form.cleaned_data['id']).user.id).delete()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
+                    User.objects.filter(id = seller.user.id).delete()
                     Seller.objects.filter(id=form.cleaned_data['id']).delete()
 
-                return HttpResponseRedirect('/kyntra/admin/sellers/')
+                return redirect('admin_sellers')
 
         return admin_sellers(request)
     else:
@@ -520,10 +531,12 @@ def admin_addproduct(request):
             if form.is_valid():
                 product = form.save()
                 product.save()
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=product.id, object_repr=product.name, action_flag=1)
+
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                return HttpResponseRedirect('/kyntra/admin/products/')
+                return redirect('admin_products')
 
         # if a GET (or any other method) we'll create a blank form
             # remove
@@ -543,15 +556,27 @@ def admin_removeproduct(request):
         if request.method == 'POST':
             form = AdminRemoveProductsForm(request.POST)
             if form.is_valid():
+                prod = Product.objects.get(id=form.cleaned_data['id'])
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=prod.id, object_repr=prod.name, action_flag=3)
                 Product.objects.filter(id=form.cleaned_data['id']).delete()
-
-                return HttpResponseRedirect('/kyntra/admin/products/')
+                
+                return redirect('admin_products')
 
         return admin_products(request)
     else:
         return redirect_user(request)
 
-    # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho
+      
+def admin_logs(request):
+    if admin_check(request):
+        logs = LogEntry.objects.all()
+        # buyer_count = option
+        return render(request, 'admin/admin_logs.html', {
+            'name': 'admin_logs',
+            'logs': logs,
+        })
+    else:
+        return redirect_user(request)
 
 
 def seller_registration(request):
@@ -568,12 +593,18 @@ def seller_check(request):
         return False 
   
 def showAllProducts(request):
-    if(seller_check(request)):
+    if(seller_check(request=request)):
         authenticated_seller= Seller.objects.get(user=request.user)
-        return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
-    else: 
-        return redirect_user(request)
-
+        if(authenticated_seller.approved and authenticated_seller.applied ):
+            if(seller_check(request)):
+                return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+            else:   
+                return redirect_user(request)
+        elif(not authenticated_seller.approved):
+            return redirect("unapproved")
+        else:
+            return redirect("rejected")
+    else: return redirect_user(request=request)   
         
 
 def addProductFormView(request):
@@ -585,6 +616,8 @@ def addProductFormView(request):
             model.seller=Seller.objects.get(Q(user = request.user))
             model.save()
             form =AddProductForm()
+            LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=model.id, object_repr=model.name, action_flag=1)
+
             return redirect('seller_all_products')
 
         context={
@@ -598,29 +631,74 @@ def addProductFormView(request):
 def editProductFormView(request, id):
     if(seller_check(request)):
         authenticated_seller= Seller.objects.get(user=request.user)
-        current_product=Product.objects.get(pk=id)
-        if(current_product.seller==authenticated_seller):
-            instance=get_object_or_404(Product, id=id)
-            form =AddProductForm(request.POST or None, request.FILES,instance=instance)
+        if(authenticated_seller.approved and authenticated_seller.applied ):
+            form =AddProductForm(request.POST or None,request.FILES)
             if(form.is_valid()):
                 if(current_product.seller==authenticated_seller):
                     model =form.save(commit=False)
                     model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
                     model.save()
                     form =AddProductForm()
+                model =form.save(commit=False)
+            
+                model.seller=Seller.objects.get(Q(user = request.user))
+                model.save()
+                form =AddProductForm()
                 return redirect('seller_all_products')
 
             context={
                 'form':form,
-                'editing':True,
-                'id':id
+                'editing':False
             }
             return render(request, "seller/add_product.html", context)
-        else: 
-          return redirect_user(request=request)
+        else: redirect_user(request=request)
     else :
-      return redirect_user(request=request)
+      return redirect_user(request=request )
     
+class EditProductView(UpdateView) :
+    model = Product
+    fields=['name','price','description', 'quantity','category', 'image1','image2']
+    template_name="seller/add_product.html"
+    success_url =reverse_lazy('seller_all_products') 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["editing"]=True
+        return context
+    def get_object(self):
+        obj = super().get_object()
+        if obj.seller.user != self.request.user:
+            raise Http404
+        obj.save()
+        return obj
+    def form_valid(self, form):
+        # The super call to form_valid creates a model instance
+        # under self.object.
+        response = super(EditProductView, self).form_valid(form)
+
+        # Do custom stuff here...
+        LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=self.object.id, object_repr=self.object.name, action_flag=2)
+
+        return response
+  
+class RemoveProductView(DeleteView) :
+    model = Product
+    
+    template_name="seller/remove_product.html"
+    success_url =reverse_lazy('seller_all_products') 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["editing"]=True
+        return context
+
+    def get_object(self):
+        obj = super().get_object()
+        if obj.seller.user != self.request.user:
+            raise Http404
+        LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=obj.id, object_repr=obj.name, action_flag=3)
+        return obj
+     
+        
+
 def logoutView(request):
     logout(request)
     return redirect('login')
@@ -630,13 +708,14 @@ def seller_removeproduct(request):
     if(seller_check(request=request) and request.method == 'POST'):
         auth_seller=Seller.objects.get(user=request.user)
         form = SellerRemoveProductsForm(request.POST)
-        product=Product.objects.get(id=request.POST['id'])
+        product=Product.objects.get(id=request.POST['pk'])
         if(product.seller==auth_seller):
             if form.is_valid():
                 if(product.seller==auth_seller):
                     Product.objects.filter(id=request.POST['id']).delete()
+
                 return redirect("seller_all_products")
-            return showAllProducts(request)
+            return redirect_user(request)
         else:
           return redirect_user(request)
     else:
@@ -670,6 +749,8 @@ def editProfileView(request):
                         seller.gst_number = gst_number
                     seller.user.save()
                     seller.save()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+
                     return redirect('edit_profile')
             elif user_profile.is_buyer:
                 form = BuyerProfileForm(request.POST, instance=user_profile)
@@ -688,6 +769,7 @@ def editProfileView(request):
                         buyer.user.last_name = last_name
                     buyer.user.save()
                     buyer.save()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=2)
                     return redirect('edit_profile')
             else:
                 return HttpResponseNotFound()
@@ -751,8 +833,6 @@ def deleteAccountRequest(request):
             return HttpResponseNotFound()
     except UserProfile.DoesNotExist:
         raise Http404()
-
-
 def deleteAccount(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -764,12 +844,14 @@ def deleteAccount(request):
             if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
                 if user_profile.is_seller:
                     seller = Seller.objects.get(user=request.user)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()
                     seller.delete()
                 elif user_profile.is_buyer:
                     buyer = Buyer.objects.get(user=request.user)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()
@@ -784,5 +866,9 @@ def deleteAccount(request):
     except (UserProfile.DoesNotExist, Seller.DoesNotExist, Buyer.DoesNotExist):
         raise Http404()
     return render(request, 'general/delete_account.html')
+# rejected_seller
 
-      
+def rejected_seller(request):
+    return render(request, 'seller/unapproved_user.html',{"heading":"Application Rejected","message":"Please note: Your Application has been rejected. Please revise your application and apply again.","reject":True})
+def unapproved_seller(request):
+    return render(request, 'seller/unapproved_user.html',{"heading":"Not Verified!","message":"Please wait till our admin accepts your request!!!","reject":False})
