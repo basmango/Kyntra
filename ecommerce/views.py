@@ -568,12 +568,15 @@ def seller_check(request):
         return False 
   
 def showAllProducts(request):
-    if(seller_check(request)):
-        authenticated_seller= Seller.objects.get(user=request.user)
-        return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
-    else: 
-        return redirect_user(request)
-
+    authenticated_seller= Seller.objects.get(user=request.user)
+    if(authenticated_seller.approved and authenticated_seller.applied ):
+        if(seller_check(request)):
+            return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+        else:   
+            return redirect_user(request)
+    else:
+        return render(request,'seller/unapproved_user.html',{})
+ 
         
 
 def addProductFormView(request):
@@ -601,7 +604,7 @@ def editProductFormView(request, id):
         current_product=Product.objects.get(pk=id)
         if(current_product.seller==authenticated_seller):
             instance=get_object_or_404(Product, id=id)
-            form =AddProductForm(request.POST or None, request.FILES,instance=instance)
+            form =AddProductForm(request.POST or None , request.FILES or None ,instance=instance)
             if(form.is_valid()):
                 if(current_product.seller==authenticated_seller):
                     model =form.save(commit=False)
@@ -785,4 +788,5 @@ def deleteAccount(request):
         raise Http404()
     return render(request, 'general/delete_account.html')
 
-      
+def unapproved_seller(request):
+    return render(request, 'seller/unapproved_user.html')
