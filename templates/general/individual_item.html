@@ -64,6 +64,8 @@
 
 				<p style="height : 30%; text-align:left;" class="border border-dark p-2 overflow-auto">
 					{{object.description}}</p>
+
+				{% if user.userprofile.is_buyer %}
 				<div style="text-align:center">
 					<form action="{% url 'purchase_endpoint' %}" method="post">
 						{% csrf_token %}
@@ -73,8 +75,8 @@
 						<input class="btn btn-success m-2" type="submit" value="Buy Now">
 					</form>
 
-
 				</div>
+				{% endif %}
 
 			</div>
 		</div>
