@@ -59,15 +59,9 @@
 				</h5>
 				<h5 class="m-2"> Seller : {{ object.seller.user }}
 				</h5>
-				<h5 class="m-2"> Description
-				</h5>
-
-				<p style="height : 30%; text-align:left;" class="border border-dark p-2 overflow-auto">
-					{{object.description}}</p>
-
-				<button onclick="shareButton()" class="btn btn-primary m-2">Share</button>
-
-				{% if user.userprofile.is_buyer %}
+				
+<hr/>
+				{% if user.userprofile.is_buyer and object.quantity > 0  %}
 				<div style="text-align:center">
 					<form action="{% url 'purchase_endpoint' %}" method="post">
 						{% csrf_token %}
@@ -82,12 +76,19 @@
 
 			</div>
 		</div>
+	
+
+				<p style=" text-align:left;" class="border border-dark p-2 overflow-auto">
+					{{object.description}}</p>
+
 
 		<hr />
 
 		<a href="{% url 'index' %}" class="btn btn-primary m-2" style="float:left"> Back to Home</a>
+
 		<a href="{% url 'search_results'  %}?category={{object.category}}" class="btn btn-secondary m-2"
 			style="float:right">View Similar Products ></a>
+						<button style="float:right" onclick="shareButton()" class="btn btn-primary m-2">Share</button>
 
 	</div>
 	<br />
