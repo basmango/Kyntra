@@ -6,7 +6,7 @@
 <main>
     <div class="container card mt-3 py-3 ">
         {% if editing %}
-        <p class="fs-4">Edit Product</p>
+        <p class="fs-4">Edit Product </p>
         {% endif %}
         {% if not editing %}
         <p class="fs-4">Add Product</p>
@@ -27,9 +27,9 @@
         </form>
         {% if editing %}
 
-        <form action="/kyntra/seller/removeproducts/" enctype="multipart/form-data" method="POST">
+        <form action="{% url 'seller_removeproduct' %}" enctype="multipart/form-data" method="POST">
             {% csrf_token %}
-            <input type="hidden" value="{{ id }}" name="id">
+            <input type="hidden" value="{{product.pk}}" name="pk">
             <div class="d-grid gap-2 mt-1">
                 <a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWarning"> Remove</a>
             </div>
