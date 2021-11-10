@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect, request, HttpRespons
 from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import DeleteView, UpdateView
 from .forms import AddressForm, BuyerSignUpForm, EditProductForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
 
 from django.views.generic.detail import DetailView
@@ -618,7 +618,23 @@ class EditProductView(UpdateView) :
             raise Http404
         obj.save()
         return obj
+  
+class RemoveProductView(DeleteView) :
+    model = Product
+    
+    template_name="seller/remove_product.html"
+    success_url =reverse_lazy('seller_all_products') 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["editing"]=True
+        return context
 
+    def get_object(self):
+        obj = super().get_object()
+        if obj.seller.user != self.request.user:
+            raise Http404
+        return obj
+     
 
 def logoutView(request):
     logout(request)
@@ -750,8 +766,6 @@ def deleteAccountRequest(request):
             return HttpResponseNotFound()
     except UserProfile.DoesNotExist:
         raise Http404()
-
-
 def deleteAccount(request):
     if not request.user.is_authenticated:
         return redirect('login')
