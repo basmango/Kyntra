@@ -60,7 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
+ecommerce/migrations/*
 # Flask stuff:
 instance/
 .webassets-cache
@@ -132,3 +132,4 @@ dmypy.json
 user_profile/
 product_images/
 media/
+

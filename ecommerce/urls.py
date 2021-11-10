@@ -21,10 +21,11 @@ urlpatterns = [
     path('admin/removeproducts/', views.admin_removeproduct, name='admin_removeproduct'),
 
 
-    path('seller/all_products/', views.SellerAllView.as_view(), name='seller_all_products'),
-    path('seller/all_products/search/', views.SellerSearchView.as_view(), name='seller_searched_products'),
+    path('seller/all_products/', views.showAllProducts, name='seller_all_products'),
+    # path('seller/all_products/search/', views.SellerSearchView.as_view(), name='seller_searched_products'),
     path('seller/add_product/', views.addProductFormView, name='add_product'),
     path('seller/edit_product/<int:id>/', views.editProductFormView, name='edit_product'),
+     path('seller/removeproducts/', views.seller_removeproduct, name='seller_removeproduct'),
     # path('seller/delete_product/<int:id>/', views.deleteProductFormView, name='delete_product'),
     path('seller/registration/', views.seller_registration, name='seller_registration'),
     path('search/',views.SearchProductListView.as_view(),name="search_results"),
