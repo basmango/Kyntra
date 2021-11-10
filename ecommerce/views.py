@@ -316,7 +316,7 @@ def seller_signup(request):
             nextTime = datetime.datetime.now() + datetime.timedelta(minutes=15)
             otp = getRandomNumber()
             Seller.objects.create(user=user, otp=otp, otp_expiry=nextTime, company_name=form.cleaned_data.get(
-                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'])
+                'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'], applied=True)
             send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             return redirect('otp_verification')
@@ -548,42 +548,17 @@ def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
 
 
-class SellerAllView(ListView):
-    model = Product
-    template_name = 'seller/all_products.html'
-
-    def get_queryset(self):  # new
-        return Product.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "All Products"
-        return context
 
 
-class SellerSearchView(ListView):
-    model = Product
-    template_name = 'seller/all_products.html'
-
-    def get_queryset(self):
-        query = self.request.GET.get('query')
-        return Product.objects.filter(name__icontains=query)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = "query"
-        return context
-
-
+def seller_check(request):
+    return (request.user.is_authenticated and UserProfile.objects.get(user=request.user).is_seller)  
+  
 def showAllProducts(request):
-	if(not request.user.is_authenticated):
-		return HttpResponse("Not Registered User")
-	requesting_user_id=request.user.id;
-	try:
-		authenticated_seller= Seller.objects.get(pk=requesting_user_id);
+	if(seller_check(request=request)):
+		authenticated_seller= Seller.objects.get(user=request.user)
 		return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
-	except Exception as e:
-		return HttpResponse("404 Error")
+	else: return HttpResponseNotFound()
+
 		
 
 def addProductFormView(request):
@@ -768,3 +743,4 @@ def deleteAccount(request):
             return redirect('edit_profile')
     return render(request, 'general/delete_account.html')
 
+      
