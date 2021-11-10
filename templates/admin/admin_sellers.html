@@ -15,7 +15,7 @@
 						<b>Users</b>
 					</div>
 					<div class="list-group list-group-flush">
-						<a href="/kyntra/admin/sellers/"
+						<a href="{% url 'admin_sellers'%}"
 							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'all' %} active {% endif %}">
 							All users
 							<span
@@ -33,7 +33,7 @@
 						<b>Applications</b>
 					</div>
 					<div class="list-group list-group-flush">
-						<a href="/kyntra/admin/sellers/pending"
+						<a href="{% url 'admin_sellers' 'pending'%}"
 							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'pending' %} active {% endif %}">
 							Pending
 							<span
@@ -41,7 +41,7 @@
 								{{pending_count}}
 							</span>
 						</a>
-						<a href="/kyntra/admin/sellers/approved"
+						<a href="{% url 'admin_sellers' 'approved'%}"
 							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'approved' %} active {% endif %}">
 							Approved
 							<span
@@ -49,7 +49,7 @@
 								{{approved_count}}
 							</span>
 						</a>
-						<a href="/kyntra/admin/sellers/unapproved"
+						<a href="{% url 'admin_sellers' 'unapproved'%}"
 							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'unapproved' %} active {% endif %}">
 							Unapproved
 							<span
@@ -86,7 +86,7 @@
 										</div>
 										<div class="col-md-auto">
 
-											<form action="/kyntra/admin/selleractions/" method="POST">
+											<form action="{% url 'admin_selleractions' %}" method="POST">
 												{% csrf_token %}
 												<input type="hidden" value="{{ seller.id }}" id="id" name="id">
 											

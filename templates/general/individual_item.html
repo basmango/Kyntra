@@ -1,6 +1,6 @@
 {% extends "general/general_base.html" %}
 {% block general_content %}
-
+{% load static %}
 <div class="bg-light h-100">
 	<style>
 		body {
@@ -64,6 +64,10 @@
 
 				<p style="height : 30%; text-align:left;" class="border border-dark p-2 overflow-auto">
 					{{object.description}}</p>
+
+				<button onclick="shareButton()" class="btn btn-primary m-2">Share</button>
+
+				{% if user.userprofile.is_buyer %}
 				<div style="text-align:center">
 					<form action="{% url 'purchase_endpoint' %}" method="post">
 						{% csrf_token %}
@@ -73,22 +77,23 @@
 						<input class="btn btn-success m-2" type="submit" value="Buy Now">
 					</form>
 
-
 				</div>
+				{% endif %}
 
 			</div>
 		</div>
 
 		<hr />
-		<a href="/" class="btn btn-primary m-2" style="float:left">
-			Back to Home</a>
-				<a href="{% url 'search_results'  %}?category={{object.category}}" class="btn btn-secondary m-2"
-					style="float:right">View Similar Products ></a>
+
+		<a href="{% url 'index' %}" class="btn btn-primary m-2" style="float:left"> Back to Home</a>
+		<a href="{% url 'search_results'  %}?category={{object.category}}" class="btn btn-secondary m-2"
+			style="float:right">View Similar Products ></a>
 
 	</div>
 	<br />
 
 </div>
 
+<script src="{% static 'js/share.js' %}"></script>
 
 {% endblock %}

@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="list-group list-group-flush">
-                        <a href="/kyntra/admin/products/"
+                        <a href="{% url 'admin_products' %}"
                             class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'all' %} active {% endif %}">
                             All Products
                             <span
@@ -24,7 +24,7 @@
                         </a>
                         {% load index %}
                         {% for category in categories %}
-                        <a href="/kyntra/admin/products/{{category.name}}"
+                        <a href="{% url 'admin_products' category.name %}"
                             class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == category.name %} active {% endif %}">
                             {{category.name}}
                             <span
@@ -68,10 +68,10 @@
                                     </div>
                                     <div class="col-md-auto">
 
-                                        <form action="/kyntra/admin/removeproducts/" method="POST">
+                                        <form action="{% url 'admin_removeproduct' %}" method="POST">
                                             {% csrf_token %}
                                             <input type="hidden" value="{{ product.id }}" id ="id" name="id">
-                                            <a href="" class="btn btn-outline-primary">View details</a>
+                                            <a href="{% url 'product' product.id %}" class="btn btn-outline-primary">View details</a>
                                             <a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWarning"> Remove</a>
 
                                             <div class="modal fade" id="deleteWarning"	aria-labelledby="deleteWarningLabel" aria-hidden="true">
@@ -116,7 +116,7 @@
                 <h5 class="modal-title" id="exampleModalLabel">Add product</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/kyntra/admin/addproducts/" method="post">
+            <form action="{% url 'admin_addproduct' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body">
                     {{ form }}

@@ -411,7 +411,7 @@ def admin_removebuyer(request):
                 User.objects.filter(id = Buyer.objects.get(id=form.cleaned_data['id']).user.id).delete()
                 Buyer.objects.filter(id=form.cleaned_data['id']).delete()
 
-                return HttpResponseRedirect('/kyntra/admin/buyers/')
+                return redirect('admin_buyers')
 
         return admin_buyers(request)
     else:
@@ -469,7 +469,7 @@ def admin_selleractions(request):
                     User.objects.filter(id = Seller.objects.get(id=form.cleaned_data['id']).user.id).delete()
                     Seller.objects.filter(id=form.cleaned_data['id']).delete()
 
-                return HttpResponseRedirect('/kyntra/admin/sellers/')
+                return redirect('admin_sellers')
 
         return admin_sellers(request)
     else:
@@ -515,7 +515,7 @@ def admin_addproduct(request):
         # if this is a POST request we need to process the form data
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
-            form = AdminAddProductsForm(request.POST)
+            form = AdminAddProductsForm(request.POST,request.FILES)
             # check whether it's valid:
             if form.is_valid():
                 product = form.save()
@@ -523,7 +523,7 @@ def admin_addproduct(request):
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                return HttpResponseRedirect('/kyntra/admin/products/')
+                return redirect('admin_products')
 
         # if a GET (or any other method) we'll create a blank form
             # remove
@@ -545,7 +545,7 @@ def admin_removeproduct(request):
             if form.is_valid():
                 Product.objects.filter(id=form.cleaned_data['id']).delete()
 
-                return HttpResponseRedirect('/kyntra/admin/products/')
+                return redirect('admin_products')
 
         return admin_products(request)
     else:
