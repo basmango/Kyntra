@@ -71,7 +71,7 @@
 										<form action="/kyntra/admin/removeproducts/" method="POST">
 											{% csrf_token %}
 											<input type="hidden" value="{{ product.id }}" id ="id" name="id">
-											<a href="" class="btn btn-outline-primary">View details</a>
+											<a href="/kyntra/product/{{product.id}}" class="btn btn-outline-primary">View details</a>
 											<a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWarning"> Remove</a>
 
 											<div class="modal fade" id="deleteWarning"	aria-labelledby="deleteWarningLabel" aria-hidden="true">
