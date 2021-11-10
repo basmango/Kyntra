@@ -1,6 +1,7 @@
 from django.conf import settings
+from django.contrib import auth
 from django.db.models.deletion import PROTECT
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponseBase
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
@@ -467,7 +468,6 @@ def admin_selleractions(request):
                 if('deleteButton' in request.POST):
                     User.objects.filter(id = Seller.objects.get(id=form.cleaned_data['id']).user.id).delete()
                     Seller.objects.filter(id=form.cleaned_data['id']).delete()
-                    
 
                 return HttpResponseRedirect('/kyntra/admin/sellers/')
 
@@ -577,53 +577,71 @@ def showAllProducts(request):
         
 
 def addProductFormView(request):
-    form =AddProductForm(request.POST or None,request.FILES)
-    if(form.is_valid()):
-        model =form.save(commit=False)
-       
-        model.seller=Seller.objects.get(Q(user = request.user))
-        model.save()
-        form =AddProductForm()
-        return redirect('seller_all_products')
+    if(seller_check(request=request)):   
+        form =AddProductForm(request.POST or None,request.FILES)
+        if(form.is_valid()):
+            model =form.save(commit=False)
+        
+            model.seller=Seller.objects.get(Q(user = request.user))
+            model.save()
+            form =AddProductForm()
+            return redirect('seller_all_products')
 
-    context={
-        'form':form,
-        'editing':False
-    }
-    return render(request, "seller/add_product.html", context)
-
+        context={
+            'form':form,
+            'editing':False
+        }
+        return render(request, "seller/add_product.html", context)
+    else :
+      return redirect_user(request=request )
+    
 def editProductFormView(request, id):
-    instance=get_object_or_404(Product, id=id)
-    form =AddProductForm(request.POST or None, request.FILES,instance=instance)
-    if(form.is_valid()):
-        model =form.save(commit=False)
-        model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
-        model.save()
-        form =AddProductForm()
-        return redirect('seller_all_products')
+    if(seller_check(request)):
+        authenticated_seller= Seller.objects.get(user=request.user)
+        current_product=Product.objects.get(pk=id)
+        if(current_product.seller==authenticated_seller):
+            instance=get_object_or_404(Product, id=id)
+            form =AddProductForm(request.POST or None, request.FILES,instance=instance)
+            if(form.is_valid()):
+                if(current_product.seller==authenticated_seller):
+                    model =form.save(commit=False)
+                    model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
+                    model.save()
+                    form =AddProductForm()
+                return redirect('seller_all_products')
 
-    context={
-        'form':form,
-        'editing':True,
-        'id':id
-    }
-    return render(request, "seller/add_product.html", context)
-
+            context={
+                'form':form,
+                'editing':True,
+                'id':id
+            }
+            return render(request, "seller/add_product.html", context)
+        else: 
+          return redirect_user(request=request)
+    else :
+      return redirect_user(request=request)
+    
 def logoutView(request):
     logout(request)
     return redirect('login')
 
 
 def seller_removeproduct(request):
-    if request.method == 'POST':
+    if(seller_check(request=request) and request.method == 'POST'):
+        auth_seller=Seller.objects.get(user=request.user)
         form = SellerRemoveProductsForm(request.POST)
-        if form.is_valid():
-            Product.objects.filter(id=request.POST['id']).delete()
-            return HttpResponseRedirect("/kyntra/seller/all_products/")
-
-    return showAllProducts(request)
-
-
+        product=Product.objects.get(id=request.POST['id'])
+        if(product.seller==auth_seller):
+            if form.is_valid():
+                if(product.seller==auth_seller):
+                    Product.objects.filter(id=request.POST['id']).delete()
+                return redirect("seller_all_products")
+            return showAllProducts(request)
+        else:
+          return redirect_user(request)
+    else:
+      return redirect_user(request)
+    
 def editProfileView(request):
     if not request.user.is_authenticated:
         return redirect('login')
