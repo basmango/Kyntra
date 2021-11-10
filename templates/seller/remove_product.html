@@ -1,0 +1,19 @@
+{% extends "seller/seller_base.html" %}
+
+{% block content %}
+
+
+<main>
+    <div class="container card mt-3 py-3 ">
+        <form method="post">{% csrf_token %}
+            <p>Are you sure you want to delete "{{ object }}"?</p>
+            <input type="submit" value="Confirm">
+        </form>
+
+    </div>
+</main>
+<script>
+    var new_product = document.getElementById("add_product_button");
+    new_product.hidden = true
+</script>
+{% endblock %}

@@ -95,7 +95,7 @@ class AdminSellerActionsForm(forms.ModelForm):
 
 
 class AddProductForm(forms.ModelForm):
-    # submit_images = forms.ImageField(widget=forms.FileInput(attrs={'multiple':True}), required=True)
+   
     class Meta:
         model = Product
         fields = ['name', 'price', 'description',
@@ -109,6 +109,22 @@ class AddProductForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'}),
         }
 
+class EditProductForm(forms.ModelForm):
+    # submit_images = forms.ImageField(widget=forms.FileInput(attrs={'multiple':True}), required=True)
+    
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'description',
+                  'quantity', "seller", "category","image1","image2"]
+        exclude = ["seller"]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+        }
+    
 
 class OTPForm(forms.ModelForm):
     email = forms.EmailField(required=True)
