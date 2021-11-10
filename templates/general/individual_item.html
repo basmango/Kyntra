@@ -82,8 +82,8 @@
 		</div>
 
 		<hr />
-		<a href="/" class="btn btn-primary m-2" style="float:left">
-			Back to Home</a>
+		
+		<a href="{% url 'index' %}" class="btn btn-primary m-2" style="float:left">	Back to Home</a>
 				<a href="{% url 'search_results'  %}?category={{object.category}}" class="btn btn-secondary m-2"
 					style="float:right">View Similar Products ></a>
 
