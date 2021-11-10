@@ -71,7 +71,6 @@ class AdminAddProductsForm(forms.ModelForm):
             'rating': forms.NumberInput(attrs={'class': 'form-control', }),
         }
 
-
 class AdminRemoveProductsForm(forms.ModelForm):
     id = forms.IntegerField(required=True)
 
@@ -79,12 +78,19 @@ class AdminRemoveProductsForm(forms.ModelForm):
         model = Product
         fields = ()
 
-
 class AdminRemoveBuyersForm(forms.ModelForm):
     id = forms.IntegerField(required=True)
 
     class Meta:
         model = Buyer
+        fields = ()
+
+
+class AdminSellerActionsForm(forms.ModelForm):
+    id = forms.IntegerField(required=True)
+
+    class Meta:
+        model = Seller
         fields = ()
 
 
@@ -102,14 +108,6 @@ class AddProductForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
         }
-
-
-class AdminSellerActionsForm(forms.ModelForm):
-    id = forms.IntegerField(required=True)
-
-    class Meta:
-        model = Seller
-        fields = ()
 
 
 class OTPForm(forms.ModelForm):
