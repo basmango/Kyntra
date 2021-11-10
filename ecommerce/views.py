@@ -561,7 +561,7 @@ def seller_check(request):
         return False 
   
 def showAllProducts(request):
-    if(seller_check(request=request)):
+    if(seller_check(request)):
         authenticated_seller= Seller.objects.get(user=request.user)
         return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
     else: 

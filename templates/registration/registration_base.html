@@ -45,14 +45,17 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
+			
+			{% if request.user.is_authenticated%}
             <div class="collapse navbar-collapse" id="#navmenu">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="{% url 'admin_dashboard' %}" class="nav-link active">Admin Login</a>
-                    </li>
+                        <a href="{% url 'redirect_user' %}" class="nav-link active">Already logged in as {{request.user.username}} </a>
+                    
+					</li>
                 </ul>
             </div>
+			{% endif %}
         </div>
     </nav>
 
