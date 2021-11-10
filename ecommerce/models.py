@@ -18,7 +18,7 @@ class ShippingAddress(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    otp = models.PositiveSmallIntegerField(default=0)
+    otp = models.IntegerField(default=-1)
     otp_expiry = models.DateTimeField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_buyer = models.BooleanField(default=False)
@@ -45,7 +45,8 @@ class Seller(UserProfile):
     gst_number = models.CharField(max_length=15, blank=True, null=True)
     applied = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
-    document=models.FileField()
+    document = models.FileField()
+
     def __str__(self):
         return "Seller " + self.user.username
 
@@ -66,8 +67,8 @@ class Product(models.Model):
     quantity = models.IntegerField(default=0)
     last_modified = models.DateTimeField(auto_now=True)
     rating = models.FloatField(default=0)
-    image1 = models.ImageField(upload_to='media',null=False, blank=False)
-    image2 = models.ImageField(upload_to='media',null=True, blank=True)
+    image1 = models.ImageField(upload_to='media', null=False, blank=False)
+    image2 = models.ImageField(upload_to='media', null=True, blank=True)
 
     def __str__(self):
         return self.name
