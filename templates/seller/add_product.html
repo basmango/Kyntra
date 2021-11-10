@@ -27,7 +27,7 @@
         </form>
         {% if editing %}
 
-        <form action="/kyntra/seller/removeproducts/" enctype="multipart/form-data" method="POST">
+        <form action="{% url 'admin_removeproduct'%}" enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             <input type="hidden" value="{{ id }}" name="id">
             <div class="d-grid gap-2 mt-1">

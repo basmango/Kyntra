@@ -24,7 +24,7 @@
 						</li>
 					</ul> -->
 					<div class="list-group list-group-flush">
-						<a href="/kyntra/admin/buyers/"
+						<a href="{% url 'admin_buyers' %}"
 							class="list-group-item d-flex justify-content-between align-items-start list-group-item-action {% if option  == 'all' %} active {% endif %}">
 							All users
 							<span class="badge rounded-pill {% if option  == 'all' %} bg-light text-dark {% else %} bg-primary {% endif %}">
@@ -56,7 +56,7 @@
 											</p>
 										</div>
 										<div class="col-md-auto">
-											<form action="/kyntra/admin/removebuyers/" method="POST">
+											<form action="{% url 'admin_removebuyer' %}" method="POST">
 												{% csrf_token %}
 												<input type="hidden" value="{{ user.user.id }}" id ="id" name="id">
 												<a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWarning"> Remove</a>
