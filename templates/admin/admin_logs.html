@@ -1,0 +1,75 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Admin: Buyers{% endblock %}
+
+{% block content %}
+
+<section class="p-5">
+	<div class="container">
+		<div class="row">
+
+
+			<ul class="list-group list-group-flush ">
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col">
+							<b>Date/Time</b>
+						</div>
+						<div class="col">
+							<b>User</b>
+						</div>
+						<div class="col">
+							<b>Type</b>
+						</div>
+						<div class="col">
+							<b>Object</b>
+						</div>
+						<div class="col">
+							<b>Action</b>
+						</div>
+
+					</div>
+				</li>
+				{% for l in logs %}
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col">
+							{{l.action_time}}
+						</div>
+						<div class="col">
+							<p>{{l.user.username}}</p>
+						</div>
+						<div class="col">
+							{% if l.user.userprofile.is_buyer %}
+							<p>Buyer</p>
+							{% elif l.user.userprofile.is_seller %}
+							<p>Seller</p>
+							{% elif l.user.userprofile.is_admin %}
+							<p>Admin</p>
+							{% endif %}
+						</div>
+						<div class="col">
+							<p>{{l.object_repr}}
+							</p>
+						</div>
+						<div class="col">
+							{% if l.action_flag == 1 %}
+							<p>Addition</p>
+							{% elif l.action_flag == 2 %}
+							<p>Modification</p>
+							{% elif l.action_flag == 3 %}
+							<p>Deletion</p>
+							{% endif %}
+						</div>
+
+					</div>
+				</li>
+				{% endfor %}
+
+		</div>
+
+	</div>
+	</div>
+</section>
+
+{% endblock %}

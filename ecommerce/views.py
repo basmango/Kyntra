@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
@@ -215,6 +217,8 @@ def Purchase(request):
         order.save()
         product.quantity -= quantity
         product.save()
+        
+        LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=product.id, object_repr=product.name, action_flag=2)
 
         return render(request, 'payment/checkout.html',
                     {
@@ -303,6 +307,7 @@ def buyer_signup(request):
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             user.save()
             address.save()
+            LogEntry.objects.log_action(user_id=user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=user.id, object_repr=user.username, action_flag=1)
             return redirect('otp_verification')
     else:
         form = BuyerSignUpForm()
@@ -324,6 +329,7 @@ def seller_signup(request):
                 'company_name'), gst_number=form.cleaned_data.get('gst_number'), is_seller=True, document=request.FILES['document'], applied=True)
             send_mail('Your OTP for verification (Kyntra): ', 'Your OTP is {}'.format(
                 otp), settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            LogEntry.objects.log_action(user_id=user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=user.id, object_repr=user.username, action_flag=1)
             return redirect('otp_verification')
     else:
         form = SellerSignUpForm()
@@ -408,8 +414,10 @@ def admin_removebuyer(request):
         if request.method == 'POST':
             form = AdminRemoveBuyersForm(request.POST)
             if form.is_valid():
-                User.objects.filter(id = Buyer.objects.get(id=form.cleaned_data['id']).user.id).delete()
-                Buyer.objects.filter(id=form.cleaned_data['id']).delete()
+                buyer = Buyer.objects.get(id=form.cleaned_data['id'])
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
+                User.objects.filter(id = buyer.user.id).delete()
+                buyer.delete()
 
                 return redirect('admin_buyers')
 
@@ -459,15 +467,18 @@ def admin_selleractions(request):
         if request.method == 'POST':
             form = AdminSellerActionsForm(request.POST)
             if form.is_valid():
+                seller = Seller.objects.get(id=form.cleaned_data['id'])
                 if('approveButton' in request.POST):
-                    Seller.objects.filter(
-                        id=form.cleaned_data['id']).update(approved=True)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
+                    seller.update(approved=True)
+
                 if('rejectButton' in request.POST):
-                    Seller.objects.filter(id=form.cleaned_data['id']).update(
-                        approved=False, applied=False)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
+                    seller.update(approved=False, applied=False)
                 if('deleteButton' in request.POST):
-                    User.objects.filter(id = Seller.objects.get(id=form.cleaned_data['id']).user.id).delete()
-                    Seller.objects.filter(id=form.cleaned_data['id']).delete()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=3)
+                    User.objects.filter(id = seller.user.id).delete()
+                    seller.delete()
 
                 return redirect('admin_sellers')
 
@@ -520,6 +531,8 @@ def admin_addproduct(request):
             if form.is_valid():
                 product = form.save()
                 product.save()
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=product.id, object_repr=product.name, action_flag=1)
+
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
@@ -543,15 +556,26 @@ def admin_removeproduct(request):
         if request.method == 'POST':
             form = AdminRemoveProductsForm(request.POST)
             if form.is_valid():
+                prod = Product.objects.get(id=form.cleaned_data['id'])
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=prod.id, object_repr=prod.name, action_flag=3)
                 Product.objects.filter(id=form.cleaned_data['id']).delete()
-
+                
                 return redirect('admin_products')
 
         return admin_products(request)
     else:
         return redirect_user(request)
 
-    # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho
+def admin_logs(request):
+    if admin_check(request):
+        logs = LogEntry.objects.all()
+        # buyer_count = option
+        return render(request, 'admin/admin_logs.html', {
+            'name': 'admin_logs',
+            'logs': logs,
+        })
+    else:
+        return redirect_user(request)
 
 
 def seller_registration(request):
@@ -585,6 +609,8 @@ def addProductFormView(request):
             model.seller=Seller.objects.get(Q(user = request.user))
             model.save()
             form =AddProductForm()
+            LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=model.id, object_repr=model.name, action_flag=1)
+
             return redirect('seller_all_products')
 
         context={
@@ -608,6 +634,8 @@ def editProductFormView(request, id):
                     model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
                     model.save()
                     form =AddProductForm()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=model.id, object_repr=model.name, action_flag=2)
+
                 return redirect('seller_all_products')
 
             context={
@@ -635,6 +663,8 @@ def seller_removeproduct(request):
             if form.is_valid():
                 if(product.seller==auth_seller):
                     Product.objects.filter(id=request.POST['id']).delete()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=product.id, object_repr=product.name, action_flag=3)
+
                 return redirect("seller_all_products")
             return showAllProducts(request)
         else:
@@ -670,6 +700,8 @@ def editProfileView(request):
                         seller.gst_number = gst_number
                     seller.user.save()
                     seller.save()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
+
                     return redirect('edit_profile')
             elif user_profile.is_buyer:
                 form = BuyerProfileForm(request.POST, instance=user_profile)
@@ -688,6 +720,7 @@ def editProfileView(request):
                         buyer.user.last_name = last_name
                     buyer.user.save()
                     buyer.save()
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=2)
                     return redirect('edit_profile')
             else:
                 return HttpResponseNotFound()
@@ -764,12 +797,14 @@ def deleteAccount(request):
             if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
                 if user_profile.is_seller:
                     seller = Seller.objects.get(user=request.user)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()
                     seller.delete()
                 elif user_profile.is_buyer:
                     buyer = Buyer.objects.get(user=request.user)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()

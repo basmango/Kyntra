@@ -19,6 +19,8 @@ urlpatterns = [
     path('admin/products/<str:option>/', views.admin_products, name='admin_products'),
     path('admin/addproducts/', views.admin_addproduct, name='admin_addproduct'),
     path('admin/removeproducts/', views.admin_removeproduct, name='admin_removeproduct'),
+    path('admin/logs/', views.admin_logs, name='admin_logs'),
+
 
 
     path('seller/all_products/', views.showAllProducts, name='seller_all_products'),
