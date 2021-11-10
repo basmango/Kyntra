@@ -469,16 +469,16 @@ def admin_selleractions(request):
             if form.is_valid():
                 seller = Seller.objects.get(id=form.cleaned_data['id'])
                 if('approveButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
-                    seller.update(approved=True)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=True)
 
                 if('rejectButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
-                    seller.update(approved=False, applied=False)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=False, applied=False)
                 if('deleteButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=3)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
                     User.objects.filter(id = seller.user.id).delete()
-                    seller.delete()
+                    Seller.objects.filter(id=form.cleaned_data['id']).delete()
 
                 return redirect('admin_sellers')
 
@@ -694,14 +694,9 @@ class RemoveProductView(DeleteView) :
         obj = super().get_object()
         if obj.seller.user != self.request.user:
             raise Http404
+        LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=obj.id, object_repr=obj.name, action_flag=3)
         return obj
      
-    def form_valid(self, form):
-        # The super call to form_valid creates a model instance
-        # under self.object.
-        response = super(RemoveProductView, self).form_valid(form)
-        LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=self.object.id, object_repr=self.object.name, action_flag=3)
-        return response
         
 
 def logoutView(request):
@@ -754,7 +749,7 @@ def editProfileView(request):
                         seller.gst_number = gst_number
                     seller.user.save()
                     seller.save()
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=2)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
 
                     return redirect('edit_profile')
             elif user_profile.is_buyer:
@@ -849,7 +844,7 @@ def deleteAccount(request):
             if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
                 if user_profile.is_seller:
                     seller = Seller.objects.get(user=request.user)
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.name, action_flag=3)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()
