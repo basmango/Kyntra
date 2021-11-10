@@ -13,7 +13,7 @@ from django.views.generic.list import ListView
 from ecommerce.models import Buyer, Order, ProductImage, Seller, ShippingAddress, UserProfile, Product, Category
 from django.db.models import Q
 
-from .forms import AddressForm, BuyerSignUpForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
+from .forms import AddressForm, BuyerSignUpForm, EditProductForm, SellerRemoveProductsForm, SellerSignUpForm, BuyerProfileForm, SellerProfileForm
 
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
@@ -599,31 +599,61 @@ def addProductFormView(request):
       return redirect_user(request=request )
     
 def editProductFormView(request, id):
-    if(seller_check(request)):
-        authenticated_seller= Seller.objects.get(user=request.user)
-        current_product=Product.objects.get(pk=id)
-        if(current_product.seller==authenticated_seller):
-            instance=get_object_or_404(Product, id=id)
-            form =AddProductForm(request.POST or None , request.FILES or None ,instance=instance)
-            if(form.is_valid()):
-                if(current_product.seller==authenticated_seller):
-                    model =form.save(commit=False)
-                    model.seller=Seller.objects.filter(id__exact=request.user.id)[0]
-                    model.save()
-                    form =AddProductForm()
+    if(seller_check(request=request)):
+        if(request.method=='POST'):
+            product=Product.objects.get(Q(pk=id))
+            authenticated_seller= Seller.objects.get(user=request.user)
+            form =EditProductForm(request.POST or None, request.FILES);
+            if form.is_valid():
+                # form.save()
+                name = form.cleaned_data['name']
+                price = form.cleaned_data['price']
+                description = form.cleaned_data['description']
+                quantity = form.cleaned_data['quantity']
+                category=form.cleaned_data['category']
+                image1=form.cleaned_data['image1']
+                image2=form.cleaned_data['image2']
+                # seller.user.save()
+                # seller.save()
+                if(name!=None and name!=''):
+                    product.name=name
+                if(price!=None and price!=''):
+                    product.price=price
+                if(description!=None and description!=''):
+                    product.description=description
+                if(quantity!=None and quantity!=''):
+                    product.quantity=quantity
+                if(category!=None and category!=''):
+                    product.category=category
+                if(image1!=None and image1!=''):
+                    product.image1=image1
+                if(image2!=None and image2!=''):
+                    product.image2=image2
+                product.seller=authenticated_seller
+                
+                product.seller.save();
+                product.save();
                 return redirect('seller_all_products')
+            
+        else:
+            product=Product.objects.get(Q(pk=id))
+            form=EditProductForm(initial={
+                "name":product.name,
+                "price":product.price,
+                "description":product.description,
+                "quantity":product.quantity,
+                "category":product.category,
+                "image1":product.image1,
+                "image2":product.image2,
+                "seller":product.seller
+            })
+        return render(request, "seller/add_product.html", {
+            'form':form,
+            'editing':True,
+            'id':id
+        })
+    else: return redirect_user(request)
 
-            context={
-                'form':form,
-                'editing':True,
-                'id':id
-            }
-            return render(request, "seller/add_product.html", context)
-        else: 
-          return redirect_user(request=request)
-    else :
-      return redirect_user(request=request)
-    
 def logoutView(request):
     logout(request)
     return redirect('login')
