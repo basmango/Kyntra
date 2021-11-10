@@ -5,6 +5,7 @@ from django.http.response import Http404, HttpResponseBase
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, request, HttpResponseNotFound
@@ -407,6 +408,7 @@ def admin_removebuyer(request):
         if request.method == 'POST':
             form = AdminRemoveBuyersForm(request.POST)
             if form.is_valid():
+                User.objects.filter(id = Buyer.objects.get(id=form.cleaned_data['id']).user.id).delete()
                 Buyer.objects.filter(id=form.cleaned_data['id']).delete()
 
                 return HttpResponseRedirect('/kyntra/admin/buyers/')
@@ -464,7 +466,9 @@ def admin_selleractions(request):
                     Seller.objects.filter(id=form.cleaned_data['id']).update(
                         approved=False, applied=False)
                 if('deleteButton' in request.POST):
+                    User.objects.filter(id = Seller.objects.get(id=form.cleaned_data['id']).user.id).delete()
                     Seller.objects.filter(id=form.cleaned_data['id']).delete()
+
                 return HttpResponseRedirect('/kyntra/admin/sellers/')
 
         return admin_sellers(request)
@@ -588,7 +592,9 @@ def addProductFormView(request):
             'editing':False
         }
         return render(request, "seller/add_product.html", context)
-    else :return redirect_user(request=request )
+    else :
+      return redirect_user(request=request )
+    
 def editProductFormView(request, id):
     if(seller_check(request)):
         authenticated_seller= Seller.objects.get(user=request.user)
@@ -610,8 +616,10 @@ def editProductFormView(request, id):
                 'id':id
             }
             return render(request, "seller/add_product.html", context)
-        else: return redirect_user(request=request)
-    else :return redirect_user(request=request)
+        else: 
+          return redirect_user(request=request)
+    else :
+      return redirect_user(request=request)
     
 def logoutView(request):
     logout(request)
@@ -629,8 +637,10 @@ def seller_removeproduct(request):
                     Product.objects.filter(id=request.POST['id']).delete()
                 return redirect("seller_all_products")
             return showAllProducts(request)
-        else :return redirect_user(request)
-    else: return redirect_user(request)
+        else:
+          return redirect_user(request)
+    else:
+      return redirect_user(request)
     
 def editProfileView(request):
     if not request.user.is_authenticated:
