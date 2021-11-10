@@ -327,18 +327,21 @@ def seller_signup(request):
 
 def redirect_user(request):
     if request.user.is_authenticated:
-        user_profile = UserProfile.objects.get(user=request.user)
-        if user_profile.is_verified:
-            if user_profile.is_seller:
-                return redirect('seller_all_products')
-            elif user_profile.is_buyer:
-                return redirect('index')
-            elif user_profile.is_admin:
-                return redirect('admin_dashboard')
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            if user_profile.is_verified:
+                if user_profile.is_buyer:
+                    return redirect('index')
+                elif user_profile.is_seller:
+                    return redirect('seller_all_products')
+                elif user_profile.is_admin:
+                    return redirect('admin_dashboard')
+                else:
+                    return Http404()
             else:
-                return Http404()
-        else:
-            return redirect('otp_verification')
+                return redirect('otp_verification')
+        except UserProfile.DoesNotExist:
+            raise Http404()
     else:
         return redirect('login')
 
@@ -349,12 +352,12 @@ def index(request):
 
 def admin_check(request):
     if request.user.is_authenticated:
-        if UserProfile.objects.filter(user=request.user):
+        try:
             user_profile = UserProfile.objects.get(user=request.user)
-            if user_profile.is_admin:
-                return True
-            else:
-                return False
+            return user_profile.is_admin
+
+        except UserProfile.DoesNotExist:
+            raise Http404()
     else:
         return False
 
@@ -377,7 +380,7 @@ def admin_dashboard(request):
             'pending_count': pen,
             'product_count': p})
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_buyers(request, option='all'):
@@ -392,7 +395,7 @@ def admin_buyers(request, option='all'):
             'buyer_count': buyer_count
         })
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_removebuyer(request):
@@ -406,7 +409,7 @@ def admin_removebuyer(request):
 
         return admin_buyers(request)
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_sellers(request, option="all"):
@@ -442,7 +445,7 @@ def admin_sellers(request, option="all"):
             'unapproved_count': unapproved_count,
         })
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_selleractions(request):
@@ -462,7 +465,7 @@ def admin_selleractions(request):
 
         return admin_sellers(request)
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_products(request, option="all"):
@@ -496,7 +499,7 @@ def admin_products(request, option="all"):
             'form': form,
         })
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_addproduct(request):
@@ -524,7 +527,7 @@ def admin_addproduct(request):
         # return render(request, 'admin/name.html', {'form': form})
         return admin_products(request)
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
 
 def admin_removeproduct(request):
@@ -539,7 +542,7 @@ def admin_removeproduct(request):
 
         return admin_products(request)
     else:
-        return HttpResponseNotFound()
+        return redirect_user(request)
 
     # http://127.0.0.1:8000/kyntra/seller/all_products/search?query=pho
 
@@ -547,19 +550,24 @@ def admin_removeproduct(request):
 def seller_registration(request):
     return render(request, 'seller/seller_registration.html', {'name': 'seller_registration'})
 
-
-
-
 def seller_check(request):
-    return (request.user.is_authenticated and UserProfile.objects.get(user=request.user).is_seller)  
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            return user_profile.is_seller
+        except UserProfile.DoesNotExist:
+            raise Http404()
+    else:
+        return False 
   
 def showAllProducts(request):
-	if(seller_check(request=request)):
-		authenticated_seller= Seller.objects.get(user=request.user)
-		return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
-	else: return HttpResponseNotFound()
+    if(seller_check(request)):
+        authenticated_seller= Seller.objects.get(user=request.user)
+        return render(request, 'seller/all_products.html', {"object_list":Product.objects.filter(Q(seller=authenticated_seller))})
+    else: 
+        return redirect_user(request)
 
-		
+        
 
 def addProductFormView(request):
     form =AddProductForm(request.POST or None,request.FILES)
@@ -596,96 +604,99 @@ def editProductFormView(request, id):
 
 def logoutView(request):
     logout(request)
-    return HttpResponse("Logout Successful")
+    return redirect('login')
 
 
 def seller_removeproduct(request):
-	if request.method == 'POST':
-		form = SellerRemoveProductsForm(request.POST)
-		if form.is_valid():
-			Product.objects.filter(id=request.POST['id']).delete()
-			return HttpResponseRedirect("/kyntra/seller/all_products/")
+    if request.method == 'POST':
+        form = SellerRemoveProductsForm(request.POST)
+        if form.is_valid():
+            Product.objects.filter(id=request.POST['id']).delete()
+            return HttpResponseRedirect("/kyntra/seller/all_products/")
 
-	return showAllProducts(request)
+    return showAllProducts(request)
 
 
 def editProfileView(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    user_profile = UserProfile.objects.get(user=request.user)
-    if not user_profile.is_verified:
-        return redirect('login')
-    address_form = None
-    if request.method == 'POST':
-        if user_profile.is_seller:
-            form = SellerProfileForm(request.POST, instance=user_profile)
-            seller = Seller.objects.get(user=request.user)
-            if form.is_valid():
-                # form.save()
-                first_name = form.cleaned_data['first_name']
-                last_name = form.cleaned_data['last_name']
-                company_name = form.cleaned_data['company_name']
-                gst_number = form.cleaned_data['gst_number']
-                if first_name != '':
-                    seller.user.first_name = first_name
-                if last_name != '':
-                    seller.user.last_name = last_name
-                if company_name != '':
-                    seller.company_name = company_name
-                if gst_number != '':
-                    seller.gst_number = gst_number
-                seller.user.save()
-                seller.save()
-                return redirect('edit_profile')
-        elif user_profile.is_buyer:
-            form = BuyerProfileForm(request.POST, instance=user_profile)
-            buyer = Buyer.objects.get(user=request.user)
-            address_form = AddressForm(
-                request.POST, instance=buyer.address)
-            if address_form.is_valid():
-                address_form.save()
-            if form.is_valid():
-                # form.save()
-                first_name = form.cleaned_data['first_name']
-                last_name = form.cleaned_data['last_name']
-                if first_name != '':
-                    buyer.user.first_name = first_name
-                if last_name != '':
-                    buyer.user.last_name = last_name
-                buyer.user.save()
-                buyer.save()
-                return redirect('edit_profile')
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if not user_profile.is_verified:
+            return redirect('login')
+        address_form = None
+        if request.method == 'POST':
+            if user_profile.is_seller:
+                form = SellerProfileForm(request.POST, instance=user_profile)
+                seller = Seller.objects.get(user=request.user)
+                if form.is_valid():
+                    # form.save()
+                    first_name = form.cleaned_data['first_name']
+                    last_name = form.cleaned_data['last_name']
+                    company_name = form.cleaned_data['company_name']
+                    gst_number = form.cleaned_data['gst_number']
+                    if first_name != '':
+                        seller.user.first_name = first_name
+                    if last_name != '':
+                        seller.user.last_name = last_name
+                    if company_name != '':
+                        seller.company_name = company_name
+                    if gst_number != '':
+                        seller.gst_number = gst_number
+                    seller.user.save()
+                    seller.save()
+                    return redirect('edit_profile')
+            elif user_profile.is_buyer:
+                form = BuyerProfileForm(request.POST, instance=user_profile)
+                buyer = Buyer.objects.get(user=request.user)
+                address_form = AddressForm(
+                    request.POST, instance=buyer.address)
+                if address_form.is_valid():
+                    address_form.save()
+                if form.is_valid():
+                    # form.save()
+                    first_name = form.cleaned_data['first_name']
+                    last_name = form.cleaned_data['last_name']
+                    if first_name != '':
+                        buyer.user.first_name = first_name
+                    if last_name != '':
+                        buyer.user.last_name = last_name
+                    buyer.user.save()
+                    buyer.save()
+                    return redirect('edit_profile')
+            else:
+                return HttpResponseNotFound()
         else:
-            return HttpResponseNotFound()
-    else:
-        if user_profile.is_seller:
-            seller = Seller.objects.get(user=request.user)
-            form = SellerProfileForm(initial={
-                'email': seller.user.email,
-                'username': seller.user.username,
-                'first_name': seller.user.first_name,
-                'last_name': seller.user.last_name,
-                'company_name': seller.company_name,
-                'gst_number': seller.gst_number
-            })
-        elif user_profile.is_buyer:
-            buyer = Buyer.objects.get(user=request.user)
-            form = BuyerProfileForm(initial={
-                'email': buyer.user.email,
-                'username': buyer.user.username,
-                'first_name': buyer.user.first_name,
-                'last_name': buyer.user.last_name
-            })
-            address = buyer.address
-            address_form = AddressForm(initial={
-                "address1": address.address1,
-                "address2": address.address2,
-                "city": address.city,
-                "zipcode": address.zipcode,
-                "country": address.country
-            })
-        else:
-            return HttpResponseNotFound()
+            if user_profile.is_seller:
+                seller = Seller.objects.get(user=request.user)
+                form = SellerProfileForm(initial={
+                    'email': seller.user.email,
+                    'username': seller.user.username,
+                    'first_name': seller.user.first_name,
+                    'last_name': seller.user.last_name,
+                    'company_name': seller.company_name,
+                    'gst_number': seller.gst_number
+                })
+            elif user_profile.is_buyer:
+                buyer = Buyer.objects.get(user=request.user)
+                form = BuyerProfileForm(initial={
+                    'email': buyer.user.email,
+                    'username': buyer.user.username,
+                    'first_name': buyer.user.first_name,
+                    'last_name': buyer.user.last_name
+                })
+                address = buyer.address
+                address_form = AddressForm(initial={
+                    "address1": address.address1,
+                    "address2": address.address2,
+                    "city": address.city,
+                    "zipcode": address.zipcode,
+                    "country": address.country
+                })
+            else:
+                return HttpResponseNotFound()
+    except UserProfile.DoesNotExist:
+        raise Http404()
     return render(request, 'general/edit_profile.html',
                   {
                       'form': form,
@@ -697,50 +708,56 @@ def editProfileView(request):
 def deleteAccountRequest(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    user_profile = UserProfile.objects.get(user=request.user)
-    if not user_profile.is_verified:
-        return redirect('login')
-    if request.method == 'POST':
-        # send mail to user with new otp and link to verify
-        otp = getRandomNumber()
-        user_profile.otp = otp
-        nextTime = datetime.datetime.now() + datetime.timedelta(minutes=15)
-        user_profile.otp_expiry = nextTime
-        send_mail('Your OTP for account deletion (Kyntra): ', 'OTP to delete your account is {}'.format(
-            otp), settings.EMAIL_HOST_USER, [request.user.email], fail_silently=False)
-        user_profile.save()
-        return render(request, 'general/delete_account.html')
-    else:
-        return HttpResponseNotFound()
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if not user_profile.is_verified:
+            return redirect('login')
+        if request.method == 'POST':
+            # send mail to user with new otp and link to verify
+            otp = getRandomNumber()
+            user_profile.otp = otp
+            nextTime = datetime.datetime.now() + datetime.timedelta(minutes=15)
+            user_profile.otp_expiry = nextTime
+            send_mail('Your OTP for account deletion (Kyntra): ', 'OTP to delete your account is {}'.format(
+                otp), settings.EMAIL_HOST_USER, [request.user.email], fail_silently=False)
+            user_profile.save()
+            return render(request, 'general/delete_account.html')
+        else:
+            return HttpResponseNotFound()
+    except UserProfile.DoesNotExist:
+        raise Http404()
 
 
 def deleteAccount(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    user_profile = UserProfile.objects.get(user=request.user)
-    if not user_profile.is_verified:
-        return redirect('login')
-    if request.method == 'POST':
-        if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
-            if user_profile.is_seller:
-                seller = Seller.objects.get(user=request.user)
-                logout(request)
-                user_profile.user.delete()
-                user_profile.delete()
-                seller.delete()
-            elif user_profile.is_buyer:
-                buyer = Buyer.objects.get(user=request.user)
-                logout(request)
-                user_profile.user.delete()
-                user_profile.delete()
-                buyer.address.delete()
-                buyer.delete()
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if not user_profile.is_verified:
             return redirect('login')
-        else:
-            user_profile.otp_expiry = datetime.datetime.now(
-                datetime.timezone.utc)
-            user_profile.save()
-            return redirect('edit_profile')
+        if request.method == 'POST':
+            if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
+                if user_profile.is_seller:
+                    seller = Seller.objects.get(user=request.user)
+                    logout(request)
+                    user_profile.user.delete()
+                    user_profile.delete()
+                    seller.delete()
+                elif user_profile.is_buyer:
+                    buyer = Buyer.objects.get(user=request.user)
+                    logout(request)
+                    user_profile.user.delete()
+                    user_profile.delete()
+                    buyer.address.delete()
+                    buyer.delete()
+                return redirect('login')
+            else:
+                user_profile.otp_expiry = datetime.datetime.now(
+                    datetime.timezone.utc)
+                user_profile.save()
+                return redirect('edit_profile')
+    except UserProfile.DoesNotExist:
+        raise Http404()
     return render(request, 'general/delete_account.html')
 
       
