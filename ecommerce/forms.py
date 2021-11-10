@@ -71,14 +71,12 @@ class AdminAddProductsForm(forms.ModelForm):
             'rating': forms.NumberInput(attrs={'class': 'form-control', }),
         }
 
-
 class AdminRemoveProductsForm(forms.ModelForm):
     id = forms.IntegerField(required=True)
 
     class Meta:
         model = Product
         fields = ()
-
 
 class AdminRemoveBuyersForm(forms.ModelForm):
     id = forms.IntegerField(required=True)
@@ -88,12 +86,20 @@ class AdminRemoveBuyersForm(forms.ModelForm):
         fields = ()
 
 
+class AdminSellerActionsForm(forms.ModelForm):
+    id = forms.IntegerField(required=True)
+
+    class Meta:
+        model = Seller
+        fields = ()
+
+
 class AddProductForm(forms.ModelForm):
     # submit_images = forms.ImageField(widget=forms.FileInput(attrs={'multiple':True}), required=True)
     class Meta:
         model = Product
         fields = ['name', 'price', 'description',
-                  'quantity', "seller", "category"]
+                  'quantity', "seller", "category","image1","image2"]
         exclude = ["seller"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -101,16 +107,7 @@ class AddProductForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-
         }
-
-
-class AdminSellerActionsForm(forms.ModelForm):
-    id = forms.IntegerField(required=True)
-
-    class Meta:
-        model = Seller
-        fields = ()
 
 
 class OTPForm(forms.ModelForm):

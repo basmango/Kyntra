@@ -12,7 +12,7 @@
         <p class="fs-4">Add Product</p>
         {% endif %}
         <hr />
-        <form method='POST'>
+        <form method='POST' enctype="multipart/form-data">
             {% csrf_token %}
             {{form.as_p}}
             <div class="d-grid gap-2">
@@ -27,7 +27,7 @@
         </form>
         {% if editing %}
 
-        <form action="/kyntra/seller/removeproducts/" method="POST">
+        <form action="/kyntra/seller/removeproducts/" enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             <input type="hidden" value="{{ id }}" name="id">
             <div class="d-grid gap-2 mt-1">

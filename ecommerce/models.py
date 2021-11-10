@@ -66,6 +66,8 @@ class Product(models.Model):
     quantity = models.IntegerField(default=0)
     last_modified = models.DateTimeField(auto_now=True)
     rating = models.FloatField(default=0)
+    image1 = models.ImageField(upload_to='media',null=False, blank=False)
+    image2 = models.ImageField(upload_to='media',null=True, blank=True)
 
     def __str__(self):
         return self.name
