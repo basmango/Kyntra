@@ -694,7 +694,8 @@ class RemoveProductView(DeleteView) :
         obj = super().get_object()
         if obj.seller.user != self.request.user:
             raise Http404
-        LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=obj.id, object_repr=obj.name, action_flag=3)
+        if self.request.method == 'POST':
+            LogEntry.objects.log_action(user_id=self.request.user.id, content_type_id=ContentType.objects.get_for_model(Product).pk, object_id=obj.id, object_repr=obj.name, action_flag=3)
         return obj
      
         
