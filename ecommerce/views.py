@@ -414,8 +414,8 @@ def admin_removebuyer(request):
         if request.method == 'POST':
             form = AdminRemoveBuyersForm(request.POST)
             if form.is_valid():
-                buyer = Buyer.objects.get(id=form.cleaned_data['id'])
-                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
+                buyer = Buyer.objects.get(user=User.objects.get(id =form.cleaned_data['id']))
+                LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.user.id, object_repr=buyer.user.username, action_flag=3)
                 User.objects.filter(id = buyer.user.id).delete()
                 buyer.delete()
 
@@ -467,18 +467,22 @@ def admin_selleractions(request):
         if request.method == 'POST':
             form = AdminSellerActionsForm(request.POST)
             if form.is_valid():
-                seller = Seller.objects.get(id=form.cleaned_data['id'])
+                seller = Seller.objects.get(user=User.objects.get(id =form.cleaned_data['id']))
                 if('approveButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
-                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=True)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.user.id, object_repr=seller.user.username, action_flag=2)
+                    seller.approved=True
+                    seller.save()
 
                 if('rejectButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
-                    Seller.objects.filter(id=form.cleaned_data['id']).update(approved=False, applied=False)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.user.id, object_repr=seller.user.username, action_flag=2)
+                    seller.approved=False
+                    seller.applied=False
+                    seller.save()
+
                 if('deleteButton' in request.POST):
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.user.id, object_repr=seller.user.username, action_flag=3)
                     User.objects.filter(id = seller.user.id).delete()
-                    Seller.objects.filter(id=form.cleaned_data['id']).delete()
+                    seller.delete()
 
                 return redirect('admin_sellers')
 
@@ -750,7 +754,7 @@ def editProfileView(request):
                         seller.gst_number = gst_number
                     seller.user.save()
                     seller.save()
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=2)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.user.id, object_repr=seller.user.username, action_flag=2)
 
                     return redirect('edit_profile')
             elif user_profile.is_buyer:
@@ -770,7 +774,7 @@ def editProfileView(request):
                         buyer.user.last_name = last_name
                     buyer.user.save()
                     buyer.save()
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=2)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.user.id, object_repr=buyer.user.username, action_flag=2)
                     return redirect('edit_profile')
             else:
                 return HttpResponseNotFound()
@@ -845,14 +849,14 @@ def deleteAccount(request):
             if str(user_profile.otp) == str(request.POST['otp']) and user_profile.otp_expiry > datetime.datetime.now(datetime.timezone.utc):
                 if user_profile.is_seller:
                     seller = Seller.objects.get(user=request.user)
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.id, object_repr=seller.user.username, action_flag=3)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Seller).pk, object_id=seller.user.id, object_repr=seller.user.username, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()
                     seller.delete()
                 elif user_profile.is_buyer:
                     buyer = Buyer.objects.get(user=request.user)
-                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.id, object_repr=buyer.name, action_flag=3)
+                    LogEntry.objects.log_action(user_id=request.user.id, content_type_id=ContentType.objects.get_for_model(Buyer).pk, object_id=buyer.user.id, object_repr=buyer.user.username, action_flag=3)
                     logout(request)
                     user_profile.user.delete()
                     user_profile.delete()

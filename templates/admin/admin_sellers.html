@@ -71,7 +71,7 @@
 								<li class="list-group-item">
 									<div class="row">
 										<div class="col-md-auto">
-											{{seller.id}}
+											{{seller.user.id}}
 										</div>
 										<div class="col-md-3">
 											<p><b>{{seller.user.username}}</b>
@@ -88,7 +88,7 @@
 
 											<form action="{% url 'admin_selleractions' %}" method="POST">
 												{% csrf_token %}
-												<input type="hidden" value="{{ seller.id }}" id="id" name="id">
+												<input type="hidden" value="{{ seller.user.id }}" id="id" name="id">
 											
 												{% if seller.applied == True %}
 												<a href="{{seller.document.url}}" class="btn btn-outline-primary">View documents</a>

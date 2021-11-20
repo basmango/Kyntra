@@ -58,7 +58,7 @@
 										<div class="col-md-auto">
 											<form action="{% url 'admin_removebuyer' %}" method="POST">
 												{% csrf_token %}
-												<input type="hidden" value="{{ user.user.id }}" id ="id" name="id">
+												<input type="hidden" value="{{user.user.id}}" id ="id" name="id">
 												<a href="" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWarning"> Remove</a>
 	
 												<div class="modal fade" id="deleteWarning"	aria-labelledby="deleteWarningLabel" aria-hidden="true">
